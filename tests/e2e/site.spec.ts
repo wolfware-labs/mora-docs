@@ -20,19 +20,39 @@ test('the landing page shows the hero program and the MVP progress', async ({ pa
 test('the hero tabs switch between the example files', async ({ page }) => {
   await page.goto('/');
   const tabs = page.getByRole('tablist', { name: 'Example files' });
-  const box = await page.locator('.hero-panels').boundingBox();
+  const tab = (name: string) => tabs.getByRole('tab', { name });
+  const panel = page.getByRole('tabpanel');
+  const height = async () => (await page.locator('.hero-panels').boundingBox())!.height;
+  const program = 'WebApp.Create<App>(args)';
+  const services = 'decorate IUserStore with CachingUserStore;';
+  const model = 'struct User(Id: int, Name: string, Email: string?);';
+  const start = await height();
 
-  await tabs.getByRole('tab', { name: 'Services.mr' }).click();
-  await expect(tabs.getByRole('tab', { name: 'Services.mr' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('tabpanel')).toContainText('decorate IUserStore with CachingUserStore;');
+  await tab('Services.mr').click();
+  await expect(tab('Services.mr')).toHaveAttribute('aria-selected', 'true');
+  await expect(panel).toContainText(services);
+  expect(await height()).toBe(start);
 
   await page.keyboard.press('ArrowRight');
-  await expect(tabs.getByRole('tab', { name: 'Model.mr' })).toBeFocused();
-  await expect(page.getByRole('tabpanel')).toContainText('struct User(Id: int, Name: string, Email: string?);');
+  await expect(tab('Model.mr')).toBeFocused();
+  await expect(panel).toContainText(model);
+  expect(await height()).toBe(start);
 
   await page.keyboard.press('ArrowRight');
-  await expect(page.getByRole('tabpanel')).toContainText('WebApp.Create<App>(args)');
-  expect(await page.locator('.hero-panels').boundingBox()).toEqual(box);
+  await expect(tab('Program.mr')).toBeFocused();
+  await expect(panel).toContainText(program);
+
+  await page.keyboard.press('ArrowLeft');
+  await expect(tab('Model.mr')).toBeFocused();
+  await expect(panel).toContainText(model);
+
+  await page.keyboard.press('Home');
+  await expect(tab('Program.mr')).toBeFocused();
+  await expect(panel).toContainText(program);
+
+  await page.keyboard.press('End');
+  await expect(tab('Model.mr')).toBeFocused();
+  await expect(panel).toContainText(model);
 });
 
 test('the landing page links to the docs and the roadmap', async ({ page }) => {
