@@ -17,6 +17,24 @@ test('the landing page shows the hero program and the MVP progress', async ({ pa
   await expect(page.locator('footer')).toContainText(`© ${new Date().getFullYear()} Wolfware LLC.`);
 });
 
+test('the hero tabs switch between the example files', async ({ page }) => {
+  await page.goto('/');
+  const tabs = page.getByRole('tablist', { name: 'Example files' });
+  const box = await page.locator('.hero-panels').boundingBox();
+
+  await tabs.getByRole('tab', { name: 'Services.mr' }).click();
+  await expect(tabs.getByRole('tab', { name: 'Services.mr' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tabpanel')).toContainText('decorate IUserStore with CachingUserStore;');
+
+  await page.keyboard.press('ArrowRight');
+  await expect(tabs.getByRole('tab', { name: 'Model.mr' })).toBeFocused();
+  await expect(page.getByRole('tabpanel')).toContainText('struct User(Id: int, Name: string, Email: string?);');
+
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('tabpanel')).toContainText('WebApp.Create<App>(args)');
+  expect(await page.locator('.hero-panels').boundingBox()).toEqual(box);
+});
+
 test('the landing page links to the docs and the roadmap', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'See the full roadmap →' }).click();
