@@ -16,12 +16,17 @@ export default defineConfig({
     starlight({
       title: 'Mora',
       description: 'Documentation for Mora, a programming language with clear syntax that compiles to one native executable.',
-      favicon: '/brand/mora-mark.png',
+      favicon: '/favicon.ico',
+      head: [
+        { tag: 'link', attrs: { rel: 'icon', type: 'image/png', href: '/brand/favicon-32.png', sizes: '32x32' } },
+        { tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/brand/apple-touch-icon.png' } },
+      ],
       // The landing page and the roadmap live outside Starlight, so their anchors can't be validated.
       plugins: [starlightLinksValidator({ exclude: ['/', '/#*', '/roadmap/', '/roadmap/#*', '/llms.txt'] })],
       routeMiddleware: './src/route-middleware.ts',
       components: {
         SiteTitle: './src/components/docs/SiteTitle.astro',
+        Footer: './src/components/docs/Footer.astro',
       },
       // Code blocks stay dark in both site themes, as on the landing page.
       expressiveCode: {

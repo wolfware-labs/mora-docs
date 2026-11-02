@@ -2,6 +2,7 @@
 import '../styles/site.css';
 import Header from '../components/landing/Header.astro';
 import Footer from '../components/landing/Footer.astro';
+import BackToTop from '../components/BackToTop.astro';
 
 interface Props {
   title: string;
@@ -20,7 +21,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="dark" />
-    <link rel="icon" type="image/png" href="/brand/mora-mark.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/brand/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
     <title>{title}</title>
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
@@ -36,6 +39,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       <Header current={current} />
       <slot />
       <Footer />
+      <BackToTop />
     </div>
   </body>
 </html>
