@@ -68,33 +68,6 @@ function mapProse(markdown, fn) {
     .join('\n');
 }
 
-/** Applies `fn` to code: fenced blocks and inline code spans. */
-function mapCode(markdown, fn) {
-  let inFence = false;
-  return markdown
-    .split('\n')
-    .map((line) => {
-      if (/^\s*```/.test(line)) {
-        inFence = !inFence;
-        return line;
-      }
-      if (inFence) return fn(line);
-      return line
-        .split(/(`+[^`]*`+)/)
-        .map((part, i) => (i % 2 === 1 ? fn(part) : part))
-        .join('');
-    })
-    .join('\n');
-}
-
-/**
- * The keyword `switch` is being renamed to `match`; the site shows the new spelling in code.
- * Prose keeps the English verb.
- */
-export function renameSwitch(markdown) {
-  return mapCode(markdown, (code) => code.replace(/\bswitch\b/g, 'match'));
-}
-
 /**
  * Links every `§10.4` in prose: to the docs page that shows that section when there is one,
  * otherwise to the spec on GitHub. `where(number)` returns the docs URL or undefined.
@@ -133,7 +106,7 @@ export function demoteHeadings(markdown, levels = 1) {
 
 /** The heading text a section gets on a docs page, without its number. */
 export function pageHeading(section) {
-  return renameSwitch(section.title.replace(/\s*\[(post-)?MVP\]$/, ''));
+  return section.title.replace(/\s*\[(post-)?MVP\]$/, '');
 }
 
 const frontmatter = (fields) =>
@@ -165,7 +138,7 @@ export function buildPage(page, sections, where, order) {
   const fields = { title: page.title, description: page.description };
   if (order !== undefined) fields.sidebar = { order };
   // Shiki has no EBNF grammar; the fragments read fine as plain text.
-  const body = linkSectionRefs(renameSwitch(text), sections, where).replace(/^```ebnf$/gm, '```text');
+  const body = linkSectionRefs(text, sections, where).replace(/^```ebnf$/gm, '```text');
   return `${frontmatter(fields)}\n${body}\n\n---\n\nFrom the specification: ${sources.join(', ')}.\n`;
 }
 
@@ -176,7 +149,7 @@ export function buildPage(page, sections, where, order) {
 export function buildErrorPage(code, markdown, sections, where, errorUrl) {
   const [first, ...rest] = markdown.split('\n');
   const summary = first.replace(/^#\s*MR\d{4}:\s*/, '').trim();
-  const body = linkSectionRefs(renameSwitch(absoluteLinks(rest.join('\n').trim(), errorUrl)), sections, where);
+  const body = linkSectionRefs(absoluteLinks(rest.join('\n').trim(), errorUrl), sections, where);
   return `${frontmatter({ title: code, description: summary })}\n**${summary}**\n\n${body}\n\n---\n\nSource: [${code}.md](${ERRORS_URL}${code}.md).\n`;
 }
 

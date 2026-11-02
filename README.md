@@ -8,8 +8,6 @@ The website for the [Mora programming language](https://github.com/wolfware-labs
 - **The roadmap** reads milestones and issues from the GitHub API at build time. When GitHub cannot be reached, it falls back to `src/data/roadmap.snapshot.json`. The release lines and the milestone descriptions are in `src/data/releases.ts`.
 - **The landing page** is `src/pages/index.astro`.
 
-Code samples use `match` where the spec still says `switch`; the sync script renames the keyword in code only.
-
 ## Develop
 
 ```sh

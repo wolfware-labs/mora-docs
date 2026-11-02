@@ -5,7 +5,6 @@ import {
   githubSlug,
   linkSectionRefs,
   parseSpec,
-  renameSwitch,
 } from '../../scripts/lib/spec.mjs';
 
 const SPEC = `# Mora
@@ -18,11 +17,11 @@ Intro to seven.
 
 See §7.7 and §9.9.
 
-### 7.7 \`switch\` expressions and statements
+### 7.7 \`match\` expressions and statements
 
 \`\`\`mora
 ### not a heading
-let status = switch (store.Find(id)) {
+let status = match (store.Find(id)) {
     User u => Results.Json(u),
     none => Results.NotFound(),
 };
@@ -46,13 +45,6 @@ describe('parseSpec', () => {
     expect(sections.get('7')?.children).toEqual(['7.4', '7.7']);
     expect(sections.get('7')?.body).toBe('Intro to seven.');
     expect(sections.get('7.7')?.body).toContain('### not a heading');
-  });
-});
-
-describe('renameSwitch', () => {
-  it('renames the keyword in code and keeps the English verb in prose', () => {
-    const text = 'A `switch` over it.\nStrings switch on first send.\n```mora\nreturn switch (x) {\n```';
-    expect(renameSwitch(text)).toBe('A `match` over it.\nStrings switch on first send.\n```mora\nreturn match (x) {\n```');
   });
 });
 
