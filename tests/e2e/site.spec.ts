@@ -53,6 +53,10 @@ test('the hero tabs switch between the example files', async ({ page }) => {
   await page.keyboard.press('End');
   await expect(tab('Model.mr')).toBeFocused();
   await expect(panel).toContainText(model);
+
+  await page.keyboard.press('Control+Home');
+  await expect(tab('Model.mr')).toBeFocused();
+  await expect(panel).toContainText(model);
 });
 
 test('the landing page links to the docs and the roadmap', async ({ page }) => {

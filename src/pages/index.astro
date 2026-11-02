@@ -608,6 +608,8 @@ services</span> <span class="t">Storage</span> &#123;
       if (tab) select(tab);
     });
     list.addEventListener('keydown', (e) => {
+      // Leave Alt+Arrow (history) and Ctrl/Cmd+Home/End (page scroll) to the browser.
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
       if (i < 0) return;
       const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
