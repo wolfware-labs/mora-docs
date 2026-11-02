@@ -80,7 +80,7 @@
       "patterns": [
         {
           "name": "keyword.control.mora",
-          "match": "\\b(abstract|as|async|await|break|const|continue|default|do|else|enum|extern|false|for|foreach|if|import|in|indirect|interface|internal|is|lazy|let|macro|match|move|mut|new|none|operator|out|params|private|public|ref|return|shared|sizeof|stackalloc|static|struct|switch|this|true|union|unique|unsafe|using|var|weak|where|while|yield)\\b"
+          "match": "\\b(abstract|as|async|await|break|const|continue|default|do|else|enum|extern|false|for|foreach|if|import|in|indirect|interface|internal|is|lazy|let|macro|match|move|mut|new|none|operator|out|params|private|public|ref|return|shared|sizeof|stackalloc|static|struct|this|true|union|unique|unsafe|using|var|weak|where|while|yield)\\b"
         },
         {
           "name": "keyword.other.contextual.mora",
