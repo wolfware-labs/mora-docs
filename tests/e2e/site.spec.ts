@@ -14,6 +14,7 @@ test('the landing page shows the hero program and the MVP progress', async ({ pa
   await expect(page.locator('pre').first()).toContainText('WebApp.Create<App>(args)');
   await expect(page.locator('pre').first()).toContainText('return match (users.Find(id))');
   await expect(page.getByTestId('mvp-progress')).toHaveText(mvpText);
+  await expect(page.locator('footer')).toContainText(`© ${new Date().getFullYear()} Wolfware LLC.`);
 });
 
 test('the landing page links to the docs and the roadmap', async ({ page }) => {
@@ -70,3 +71,31 @@ for (const path of ['/', '/roadmap/', '/docs/memory/ownership/']) {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+for (const path of ['/', '/roadmap/', '/docs/language/expressions/']) {
+  test(`${path} has a back-to-top button once scrolled`, async ({ page }) => {
+    await page.goto(path);
+    const button = page.getByRole('button', { name: 'Back to top' });
+    await expect(button).toHaveAttribute('data-shown', 'false');
+    await page.mouse.wheel(0, 2000);
+    await expect(button).toHaveAttribute('data-shown', 'true');
+    await button.click();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+    await expect(button).toHaveAttribute('data-shown', 'false');
+  });
+}
+
+test('the docs use the site domain, not the old one', async ({ page }) => {
+  await page.goto('/docs/install/');
+  await expect(page.locator('main')).toContainText('https://moralang.org/install.sh');
+  await expect(page.locator('main')).not.toContainText('mora-lang.dev');
+});
+
+test('the favicon is square', async ({ request }) => {
+  const res = await request.get('/brand/favicon-32.png');
+  expect(res.ok()).toBe(true);
+  const png = await res.body();
+  // Width and height sit at bytes 16 and 20 of the IHDR chunk.
+  expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([32, 32]);
+  expect((await request.get('/favicon.ico')).ok()).toBe(true);
+});
