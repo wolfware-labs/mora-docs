@@ -99,3 +99,17 @@ test('the favicon is square', async ({ request }) => {
   expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([32, 32]);
   expect((await request.get('/favicon.ico')).ok()).toBe(true);
 });
+
+test('the docs header has one bottom border, across the full width', async ({ page }) => {
+  await page.goto('/docs/');
+  const borders = await page.evaluate(() =>
+    [...document.querySelectorAll('.header')].map((e) => ({
+      outer: e.tagName === 'HEADER',
+      width: getComputedStyle(e).borderBottomWidth,
+    })),
+  );
+  expect(borders).toEqual([
+    { outer: true, width: '1px' },
+    { outer: false, width: '0px' },
+  ]);
+});
