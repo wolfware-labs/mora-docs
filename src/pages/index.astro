@@ -29,12 +29,13 @@ import Signup from '../components/landing/Signup.astro';
 
 <div style="flex: 1 1 520px; min-width: 0">
 <div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.45)">
-<div style="display: flex; align-items: center; gap: 4px; padding: 0 12px; border-bottom: 1px solid #2A1C24; background: #170D12; overflow-x: auto">
-<span style="padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #F6EFE9; border-bottom: 2px solid #F39C3D">Program.mr</span>
-<span style="padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #9A8892">Services.mr</span>
-<span style="padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #9A8892">Model.mr</span>
+<div role="tablist" aria-label="Example files" data-hero-tabs style="display: flex; align-items: center; gap: 4px; padding: 0 12px; border-bottom: 1px solid #2A1C24; background: #170D12; overflow-x: auto">
+<button type="button" role="tab" id="hero-tab-program" aria-controls="hero-program" aria-selected="true" class="hero-tab">Program.mr</button>
+<button type="button" role="tab" id="hero-tab-services" aria-controls="hero-services" aria-selected="false" tabindex="-1" class="hero-tab">Services.mr</button>
+<button type="button" role="tab" id="hero-tab-model" aria-controls="hero-model" aria-selected="false" tabindex="-1" class="hero-tab">Model.mr</button>
 </div>
-<div style="overflow-x: auto; padding: 22px 24px">
+<div class="hero-panels">
+<div role="tabpanel" id="hero-program" aria-labelledby="hero-tab-program" class="hero-panel">
 <pre><span class="k">using</span> Std.Net.Http;
 
 <span class="k">let</span> app = <span class="t">WebApp</span>.Create&lt;<span class="t">App</span>&gt;(args);
@@ -49,6 +50,38 @@ app.MapGet(<span class="s">"/users/&#123;id&#125;"</span>, <span class="k">async
 &#125;);
 
 <span class="k">await</span> app.RunAsync(<span class="s">"127.0.0.1:8080"</span>)<span class="at">?</span>;</pre>
+</div>
+<div role="tabpanel" id="hero-services" aria-labelledby="hero-tab-services" class="hero-panel" hidden>
+<pre><span class="k">services</span> <span class="t">Storage</span> &#123;
+    <span class="k">scoped</span> <span class="t">IUserStore</span> = <span class="t">SqlUserStore</span>;
+    <span class="k">decorate</span> <span class="t">IUserStore</span> <span class="k">with</span> <span class="t">CachingUserStore</span>;
+&#125;
+
+<span class="k">services</span> <span class="t">AppBase</span> : <span class="t">Storage</span> &#123;
+    <span class="k">scoped</span> <span class="t">IAuditLog</span> = <span class="t">FileAuditLog</span>;
+    <span class="k">transient</span> <span class="t">WelcomeMail</span>;                      <span class="c">// a class bound to itself</span><span class="k">
+    singleton</span> <span class="t">IMailer</span>;                          <span class="c">// a requirement: every final block binds it</span><span class="k">
+    singleton</span> <span class="t">IHealthCheck</span> += <span class="t">DbCheck</span>;
+    <span class="k">singleton</span> <span class="t">IHealthCheck</span> += <span class="t">DiskCheck</span>;
+&#125;
+
+<span class="at">@Cfg</span>(Debug = <span class="k">true</span>)
+<span class="k">services</span> <span class="t">App</span> : <span class="t">AppBase</span> &#123;
+    <span class="k">override singleton</span> <span class="t">IMailer</span> = <span class="t">ConsoleMailer</span>;
+&#125;
+
+<span class="at">@Cfg</span>(Debug = <span class="k">false</span>)
+<span class="k">services</span> <span class="t">App</span> : <span class="t">AppBase</span> &#123;
+    <span class="k">override singleton</span> <span class="t">IMailer</span> = <span class="t">SmtpMailer</span>;
+&#125;</pre>
+</div>
+<div role="tabpanel" id="hero-model" aria-labelledby="hero-tab-model" class="hero-panel" hidden>
+<pre><span class="at">@Json</span><span class="k">
+struct</span> <span class="t">User</span>(Id: <span class="t">int</span>, Name: <span class="t">string</span>, Email: <span class="t">string</span>?);
+
+<span class="at">@Json</span><span class="k">
+struct</span> <span class="t">NewUser</span>(Name: <span class="t">string</span>, Email: <span class="t">string</span>?);</pre>
+</div>
 </div>
 <div style="border-top: 1px solid #2A1C24; background: #110A0D; padding: 16px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; overflow-x: auto">
 <div style="white-space: nowrap"><span style="color: #9A8892">$</span> mora build  <span style="color: #9A8892"># one self-contained native executable</span></div>
@@ -539,4 +572,53 @@ services</span> <span class="t">Storage</span> &#123;
 </div>
 </section>
 </main>
+<style>
+  .hero-tab {
+    padding: 12px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #9a8892;
+    cursor: pointer;
+  }
+  .hero-tab:hover { color: #d9ccd3; }
+  .hero-tab[aria-selected='true'] { color: #f6efe9; border-bottom-color: #f39c3d; }
+  .hero-tab:focus-visible { outline: 2px solid #f39c3d; outline-offset: -2px; }
+  /* All panels share one grid cell, so the window keeps the height of the longest file. */
+  .hero-panels { display: grid; }
+  .hero-panel { grid-area: 1 / 1; overflow-x: auto; padding: 22px 24px; }
+  .hero-panel[hidden] { display: block; visibility: hidden; }
+</style>
+
+<script>
+  for (const list of document.querySelectorAll<HTMLElement>('[data-hero-tabs]')) {
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement) => {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+      }
+    };
+    list.addEventListener('click', (e) => {
+      const tab = (e.target as Element).closest<HTMLButtonElement>('[role="tab"]');
+      if (tab) select(tab);
+    });
+    list.addEventListener('keydown', (e) => {
+      // Leave Alt+Arrow (history) and Ctrl/Cmd+Home/End (page scroll) to the browser.
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0) return;
+      const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      const tab = tabs[(next + tabs.length) % tabs.length];
+      select(tab);
+      tab.focus();
+    });
+  }
+</script>
 </Site>
