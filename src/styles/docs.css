@@ -137,3 +137,130 @@ h1#_top {
 h1#_top {
   font-size: clamp(2rem, 3.6vw, 2.75rem);
 }
+
+/* Layout, as on the artic site. Wide screens: the text column fills the space between the
+   sidebar and a fixed-width table of contents on the right edge. */
+:root {
+  --mora-toc-width: 16rem;
+}
+
+@media (min-width: 50rem) {
+  :root {
+    --sl-sidebar-width: 20rem;
+  }
+}
+
+@media (min-width: 72rem) {
+  :root {
+    --sl-content-width: 100%;
+  }
+
+  .main-pane {
+    --sl-content-margin-inline: 0;
+  }
+
+  [data-has-sidebar][data-has-toc] .main-pane {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+
+  [data-has-sidebar][data-has-toc] .right-sidebar-container {
+    flex: none;
+    width: var(--mora-toc-width);
+  }
+
+  .right-sidebar {
+    width: var(--mora-toc-width);
+  }
+
+  /* Starlight sizes this from --sl-sidebar-width, which is the left sidebar's width here. */
+  .right-sidebar-panel .sl-container {
+    width: auto;
+    max-width: none;
+  }
+}
+
+.right-sidebar starlight-toc a {
+  font-size: 0.9375rem;
+}
+
+/* Center the search in the window; the title and the right-hand buttons share the rest.
+   div.header is Starlight's inner header row, the grid. */
+@media (min-width: 50rem) {
+  div.header {
+    grid-template-columns: 1fr minmax(0, 24rem) 1fr;
+  }
+
+  div.header > :nth-child(2) button {
+    width: 100%;
+    max-width: none;
+  }
+
+  div.header > :nth-child(3) {
+    justify-self: end;
+  }
+}
+
+/* Thin scrollbars in the theme's colors, for the page, the sidebars and code blocks. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sl-color-gray-4) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--sl-color-gray-4) padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--sl-color-gray-3) padding-box;
+}
+
+/* Previous and next links: compact cards at the two edges of the text column, with body-size
+   titles so they read as navigation rather than another heading. They stack on phones. */
+.pagination-links {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pagination-links a {
+  flex: 0 1 26rem;
+  width: auto;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+}
+
+/* With only a next link, keep it on the right. */
+.pagination-links a[rel='next'] {
+  margin-inline-start: auto;
+}
+
+/* Narrow columns shrink the cards; only phones stack them. */
+@media (max-width: 50rem) {
+  .pagination-links {
+    flex-direction: column;
+  }
+
+  .pagination-links a,
+  .pagination-links a[rel='next'] {
+    flex-basis: auto;
+    width: 100%;
+    margin-inline-start: 0;
+  }
+}
+
+.pagination-links .link-title {
+  font-size: var(--sl-text-base);
+  font-weight: 500;
+}
