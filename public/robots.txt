@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mora-lang.dev/sitemap-index.xml
+Sitemap: https://moralang.org/sitemap-index.xml

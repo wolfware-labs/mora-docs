@@ -9,7 +9,7 @@ const moraGrammar = json('./src/lib/mora.tmLanguage.json');
 const moraTheme = json('./src/lib/mora-theme.json');
 
 export default defineConfig({
-  site: 'https://mora-lang.dev',
+  site: 'https://moralang.org',
   outDir: process.env.MORA_OUT_DIR || 'dist',
   integrations: [
     react(),
