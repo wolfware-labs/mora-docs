@@ -14,6 +14,7 @@ test('the landing page shows the hero program and the MVP progress', async ({ pa
   await expect(page.locator('pre').first()).toContainText('WebApp.Create<App>(args)');
   await expect(page.locator('pre').first()).toContainText('return match (users.Find(id))');
   await expect(page.getByTestId('mvp-progress')).toHaveText(mvpText);
+  await expect(page.locator('footer')).toContainText(`© ${new Date().getFullYear()} Wolfware LLC.`);
 });
 
 test('the landing page links to the docs and the roadmap', async ({ page }) => {
