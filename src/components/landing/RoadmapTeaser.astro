@@ -1,0 +1,43 @@
+---
+import { RELEASES, TEASERS } from '../../data/releases';
+import { progress, roadmap } from '../../lib/roadmap';
+
+const { milestones } = await roadmap();
+const [mvp, ...later] = RELEASES;
+const mvpProgress = progress(milestones.filter((m) => mvp.milestones.includes(m.code)));
+const first = mvp.milestones[0];
+const last = mvp.milestones[mvp.milestones.length - 1];
+const closedLabel = `${mvpProgress.closed} of ${mvpProgress.total} issues closed`;
+---
+
+<section id="roadmap" style="border-top: 1px solid #2E1F28; background: #180E13">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px">
+      <div style="flex: 1 1 420px">
+        <p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Roadmap</p>
+        <h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Built in the open, milestone by milestone.</h2>
+      </div>
+      <a href="/roadmap/" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none">See the full roadmap →</a>
+    </div>
+    <p style="margin: 20px 0 0; max-width: 40em; color: #D9CCD3">{mvp.version} is done when a REST API with JSON bodies, written in Mora, builds into a native executable on Linux, macOS and Windows, and a newcomer can install the toolchain with one command and get diagnostics in VS Code.</p>
+    <div style="margin-top: 32px; padding: 24px; border-radius: 16px; border: 1px solid #5A3A2A; background: #1F1219">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px">
+        <span style="font-weight: 600">{mvp.version} · {first} to {last}</span>
+        <span style="color: #B8A9B1; font-size: 15px" data-testid="mvp-progress">{closedLabel}</span>
+      </div>
+      <div role="img" aria-label={closedLabel} style="margin-top: 12px; height: 8px; border-radius: 4px; background: #33232D">
+        <div style={`width: ${mvpProgress.percent}%; height: 8px; border-radius: 4px; background: #F39C3D`}></div>
+      </div>
+    </div>
+    <ol style="margin: 16px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+      {
+        later.map((r) => (
+          <li style="padding: 18px 20px; border-radius: 12px; border: 1px solid #33232D; background: #140B10">
+            <p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #FFD27A">{r.version}</p>
+            <p style="margin: 6px 0 0; font-size: 15px; color: #B8A9B1">{TEASERS[r.version]}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

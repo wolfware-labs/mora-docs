@@ -1,0 +1,72 @@
+import { expect, test } from '@playwright/test';
+import snapshot from '../../src/data/roadmap.snapshot.json' with { type: 'json' };
+import { RELEASES } from '../../src/data/releases';
+import { progress } from '../../src/lib/roadmap';
+
+const mvp = snapshot.milestones.filter((m) => RELEASES[0].milestones.includes(m.code));
+const mvpProgress = progress(mvp);
+const mvpText = `${mvpProgress.closed} of ${mvpProgress.total} issues closed`;
+
+test('the landing page shows the hero program and the MVP progress', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle(/Mora/);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Clear syntax.');
+  await expect(page.locator('pre').first()).toContainText('WebApp.Create<App>(args)');
+  await expect(page.locator('pre').first()).toContainText('return match (users.Find(id))');
+  await expect(page.getByTestId('mvp-progress')).toHaveText(mvpText);
+});
+
+test('the landing page links to the docs and the roadmap', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'See the full roadmap →' }).click();
+  await expect(page).toHaveURL(/\/roadmap\/$/);
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Read the docs' }).click();
+  await expect(page).toHaveURL(/\/docs\/$/);
+});
+
+test('the roadmap matches the snapshot', async ({ page }) => {
+  await page.goto('/roadmap/');
+  await expect(page.getByTestId('as-of')).toHaveAttribute('datetime', snapshot.asOf);
+  await expect(page.getByTestId('release-v0.1')).toContainText(mvpText);
+  for (const m of mvp) {
+    await expect(page.getByTestId(`milestone-${m.code}`)).toContainText(`${m.closed} of ${m.open + m.closed} issues closed`);
+  }
+  for (const e of snapshot.explorations) {
+    await expect(page.getByRole('link', { name: `#${e.number} ${e.title}` })).toBeVisible();
+  }
+});
+
+test('docs pages are generated from the spec, with match in code', async ({ page }) => {
+  await page.goto('/docs/language/dependency-injection/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dependency injection');
+  await expect(page.locator('.expressive-code').first()).toContainText('services Storage {');
+  await page.goto('/docs/tour/complete-program/');
+  await expect(page.locator('main')).toContainText('match (store.Find(id))');
+  await expect(page.locator('main')).not.toContainText('switch (store.Find(id))');
+});
+
+test('every error page is listed', async ({ page }) => {
+  await page.goto('/docs/errors/');
+  const links = page.locator('main table a');
+  expect(await links.count()).toBeGreaterThan(0);
+  await links.first().click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^MR\d{4}$/);
+});
+
+test('llms.txt lists the docs', async ({ request }) => {
+  const res = await request.get('/llms.txt');
+  expect(res.ok()).toBe(true);
+  const text = await res.text();
+  expect(text).toMatch(/^# Mora/);
+  expect(text).toContain('[Dependency injection](https://mora-lang.dev/docs/language/dependency-injection/)');
+});
+
+for (const path of ['/', '/roadmap/', '/docs/memory/ownership/']) {
+  test(`${path} fits a phone screen`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(path);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}

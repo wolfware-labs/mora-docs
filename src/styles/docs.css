@@ -1,0 +1,140 @@
+/* Starlight theme for the Mora docs: the landing page's palette, with a light variant. */
+@import '@fontsource/unbounded/500.css';
+@import '@fontsource/unbounded/600.css';
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+:root {
+  --sl-font: Figtree, system-ui, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', monospace;
+  --mora-font-display: Unbounded, sans-serif;
+  --sl-text-base: 1rem;
+  --sl-line-height: 1.65;
+}
+
+/* Dark: Starlight's default theme. */
+:root,
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #3a1530;
+  --sl-color-accent: #f39c3d;
+  --sl-color-accent-high: #ffd27a;
+  --sl-color-white: #f6efe9;
+  --sl-color-gray-1: #ece2e7;
+  --sl-color-gray-2: #d9ccd3;
+  --sl-color-gray-3: #b0a0a9;
+  --sl-color-gray-4: #6a5862;
+  --sl-color-gray-5: #33232d;
+  --sl-color-gray-6: #1c1218;
+  --sl-color-black: #140b10;
+  --sl-color-bg-nav: #140b10;
+  --sl-color-bg-sidebar: #140b10;
+  --sl-color-hairline: #33232d;
+  --sl-color-hairline-light: #2e1f28;
+  --sl-color-text-accent: #f39c3d;
+  --mora-code-inline-bg: #24161d;
+  --mora-code-inline: #ffd27a;
+  --sl-color-orange-low: #22150c;
+  --sl-color-orange: #ffc27a;
+  --sl-color-orange-high: #ffc27a;
+  --sl-color-blue-low: #1e1420;
+  --sl-color-blue: #eba6cf;
+  --sl-color-blue-high: #eba6cf;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #f2dce6;
+  --sl-color-accent: #a8311f;
+  --sl-color-accent-high: #4a0e3b;
+  --sl-color-white: #1e1217;
+  --sl-color-gray-1: #2c1d24;
+  --sl-color-gray-2: #43333b;
+  --sl-color-gray-3: #6a5862;
+  --sl-color-gray-4: #9a8892;
+  --sl-color-gray-5: #e2d3c7;
+  --sl-color-gray-6: #f3eae1;
+  --sl-color-gray-7: #f8f1ea;
+  --sl-color-black: #fbf6f0;
+  --sl-color-bg-nav: #fbf6f0;
+  --sl-color-bg-sidebar: #fbf6f0;
+  --sl-color-hairline: #e2d3c7;
+  --sl-color-hairline-light: #ece0d5;
+  --sl-color-hairline-shade: #e2d3c7;
+  --sl-color-text-accent: #a8311f;
+  --mora-code-inline-bg: #f1e4da;
+  --mora-code-inline: #8e2a1f;
+  --sl-color-orange-low: #fceedc;
+  --sl-color-orange: #874a0e;
+  --sl-color-orange-high: #874a0e;
+  --sl-color-blue-low: #f6e8ef;
+  --sl-color-blue: #4a0e3b;
+  --sl-color-blue-high: #4a0e3b;
+}
+
+/* The brand stripe under the header, as on the landing page. */
+.header {
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+.page > .header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #4a0e3b, #c0392b 40%, #f39c3d 75%, #ffd27a);
+}
+
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+h1#_top {
+  font-family: var(--mora-font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-content .group-label .large,
+.sidebar-content summary .large {
+  font-family: var(--mora-font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+
+.sl-markdown-content :not(pre) > code {
+  background: var(--mora-code-inline-bg);
+  color: var(--mora-code-inline);
+  border: 0;
+  border-radius: 6px;
+  padding: 0.1em 0.35em;
+}
+
+/* `=>` stays two characters, as typed. */
+.expressive-code pre,
+.sl-markdown-content code {
+  font-variant-ligatures: none;
+}
+
+/* The current page, as in the design: a tinted pill rather than a solid accent block. */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+  background: var(--sl-color-accent-low);
+  color: var(--mora-active-text);
+  font-weight: 600;
+}
+:root,
+:root[data-theme='dark'] {
+  --mora-active-text: #ffd27a;
+}
+:root[data-theme='light'] {
+  --mora-active-text: #4a0e3b;
+}
+
+.sl-markdown-content h2 {
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+}
+.sl-markdown-content h3 {
+  font-size: 1.25rem;
+}
+h1#_top {
+  font-size: clamp(2rem, 3.6vw, 2.75rem);
+}

@@ -1,0 +1,542 @@
+---
+import Site from '../layouts/Site.astro';
+import RoadmapTeaser from '../components/landing/RoadmapTeaser.astro';
+import Signup from '../components/landing/Signup.astro';
+---
+
+<Site
+  title="Mora: clear syntax, maximum speed"
+  description="Mora is a programming language with clear, readable syntax that compiles to one native executable, with memory use that is predictable and visible in the source."
+>
+<main id="top">
+<section style="max-width: 1200px; margin: 0 auto; padding: 88px 24px 96px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 1 1 440px; min-width: 0">
+<p style="margin: 0 0 28px; display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 999px; border: 1px solid #4A2A3C; background: #1F1219; font-size: 14px; color: #E6D8DF">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #F39C3D"></span>In design and early development. Nothing to install yet.</p>
+<h1 style="margin: 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(40px, 5.4vw, 68px); line-height: 1.04; letter-spacing: -0.02em">Clear syntax.<br><span style="color: #F39C3D">Maximum speed.</span></h1>
+<p style="margin: 28px 0 0; max-width: 34em; font-size: 20px; line-height: 1.55; color: #D9CCD3">Mora is a programming language with clear, readable syntax that compiles to one native executable. Every value has one owner and is freed the moment that owner is done with it, so memory use is predictable and visible in the source.</p>
+<div style="margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px">
+<a href="#features" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 12px; background: #F39C3D; color: #1A0E12; font-weight: 600; text-decoration: none">See what's inside
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="https://github.com/wolfware-labs/mora-lang/blob/main/docs/design/mora.md" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 12px; border: 1px solid #4A3340; color: #F6EFE9; font-weight: 600; text-decoration: none">Read the specification</a>
+</div>
+<ul style="margin: 40px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 15px; color: #B8A9B1">
+<li style="display: flex; align-items: center; gap: 8px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #C0392B"></span>Predictable memory</li>
+<li style="display: flex; align-items: center; gap: 8px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #F39C3D"></span>Safe by default</li>
+<li style="display: flex; align-items: center; gap: 8px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #FFD27A"></span>Linux, macOS, Windows</li>
+</ul>
+</div>
+
+<div style="flex: 1 1 520px; min-width: 0">
+<div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.45)">
+<div style="display: flex; align-items: center; gap: 4px; padding: 0 12px; border-bottom: 1px solid #2A1C24; background: #170D12; overflow-x: auto">
+<span style="padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #F6EFE9; border-bottom: 2px solid #F39C3D">Program.mr</span>
+<span style="padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #9A8892">Services.mr</span>
+<span style="padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #9A8892">Model.mr</span>
+</div>
+<div style="overflow-x: auto; padding: 22px 24px">
+<pre><span class="k">using</span> Std.Net.Http;
+
+<span class="k">let</span> app = <span class="t">WebApp</span>.Create&lt;<span class="t">App</span>&gt;(args);
+
+<span class="c">// `users` is injected for each request</span>
+app.MapGet(<span class="s">"/users/&#123;id&#125;"</span>, <span class="k">async</span> (req: <span class="t">Request</span>, users: <span class="t">IUserStore</span>) =&gt; &#123;<span class="k">
+    let</span> id = req.RouteValue&lt;<span class="t">int</span>&gt;(<span class="s">"id"</span>)<span class="at">?</span>;<span class="k">
+    return match</span> (users.Find(id)) &#123;<span class="t">
+        User</span> u =&gt; <span class="t">Results</span>.Json(u),<span class="k">
+        none</span> =&gt; <span class="t">Results</span>.NotFound(),
+    &#125;;
+&#125;);
+
+<span class="k">await</span> app.RunAsync(<span class="s">"127.0.0.1:8080"</span>)<span class="at">?</span>;</pre>
+</div>
+<div style="border-top: 1px solid #2A1C24; background: #110A0D; padding: 16px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; overflow-x: auto">
+<div style="white-space: nowrap"><span style="color: #9A8892">$</span> mora build  <span style="color: #9A8892"># one self-contained native executable</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="features" style="border-top: 1px solid #2E1F28; background: #180E13">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">What Mora is for</p>
+<h2 style="margin: 16px 0 0; max-width: 20em; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Native programs with predictable memory.</h2>
+<p style="margin: 20px 0 0; max-width: 40em; color: #D9CCD3">Mora is for application developers who want fast native binaries while the compiler takes care of memory. Types say when a value can be missing, functions say when they can fail, and every allocation is visible in the source.</p>
+<div style="margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
+<article style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #140B10">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F39C3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+<h3 style="margin: 18px 0 8px; font-size: 19px; font-weight: 600">Predictable memory</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">Values are freed at a point you can see in the source, so programs run at a steady pace. <code>mora explain-cost</code> lists every heap allocation and why it happens.</p>
+</article>
+<article style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #140B10">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F39C3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+<h3 style="margin: 18px 0 8px; font-size: 19px; font-weight: 600">Safe by default</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">A value that may be missing says so in its type, and the compiler rules out use-after-free and data races.</p>
+</article>
+<article style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #140B10">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F39C3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>
+<h3 style="margin: 18px 0 8px; font-size: 19px; font-weight: 600">One native binary</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1"><code>mora build</code> produces one self-contained executable for Linux, macOS or Windows. Copy it and run it.</p>
+</article>
+<article style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #140B10">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F39C3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M4 12h16M4 18h7"></path><path d="M17 15l3 3-3 3"></path></svg>
+<h3 style="margin: 18px 0 8px; font-size: 19px; font-weight: 600">Errors are values</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1"><code>Result</code> and <code>?</code> propagation make failures ordinary values. Every way a function can fail shows up in its signature.</p>
+</article>
+<article style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #140B10">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F39C3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>
+<h3 style="margin: 18px 0 8px; font-size: 19px; font-weight: 600">Effects you can see</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">The compiler infers which capabilities each function uses, from files and network to the clock, and <code>uses none</code> turns that into a checked promise.</p>
+</article>
+<article style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #140B10">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F39C3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"></path></svg>
+<h3 style="margin: 18px 0 8px; font-size: 19px; font-weight: 600">Testing built in</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">Tests live next to the code they test. Every run is seeded, so a failing test replays exactly with <code>mora test --seed</code>.</p>
+</article>
+</div>
+
+<div style="margin-top: 20px; border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 22px 24px">
+<p style="margin: 0 0 12px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #9A8892">Errors say what would go wrong, and how to fix it</p>
+<pre><span style="color: #FF8C78; font-weight: 500">error[MR0310]</span>: cannot store `conn` because `Connection` is unique
+  <span class="c">--&gt;</span> src/Pool.mr:14:19
+   <span class="c">|</span>
+12 <span class="c">|</span>     <span class="k">public</span> Return(conn: <span class="t">Connection</span>)
+   <span class="c">|</span>                   <span class="c">---------------- `conn` is only borrowed for this call</span>
+13 <span class="c">|</span>     &#123;
+14 <span class="c">|</span>         _idle.Add(conn);
+   <span class="c">|</span>                   <span style="color: #FF8C78">^^^^ storing it would leave the caller with a connection it no longer owns</span><span class="c">
+   |</span><span style="color: #FFD27A">
+help</span>: take ownership of the parameter
+   <span class="c">|</span>
+12 <span class="c">|</span>     <span class="k">public</span> Return(<span style="color: #8FD18F">move</span> conn: <span class="t">Connection</span>)
+   <span class="c">|</span>                   <span style="color: #8FD18F">++++</span></pre>
+</div>
+</div>
+</section>
+
+<section id="memory" style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Memory model</p>
+<h2 style="margin: 16px 0 0; max-width: 20em; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Three kinds of type, each with a clear lifetime.</h2>
+<p style="margin: 20px 0 0; max-width: 40em; color: #D9CCD3">How a type is declared decides how it lives. Parameters borrow with <code>in</code> (the default) or <code>ref</code>, or take ownership with <code>move</code>, and a borrow never outlives the call that made it.</p>
+<div style="margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
+<article style="border-radius: 16px; border: 1px solid #33232D; background: #180E13; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 28px 28px 20px">
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #F39C3D">struct</p>
+<h3 style="margin: 8px 0 8px; font-size: 21px; font-weight: 600">Values</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">Copied on assignment, no identity, no allocation.</p>
+</div>
+<pre style="margin-top: auto; padding: 18px 28px; border-top: 1px solid #2A1C24; background: #0D0709; font-size: 13px; overflow-x: auto"><span class="k">public struct</span> <span class="t">Point</span>(X: <span class="t">float</span>, Y: <span class="t">float</span>);</pre>
+</article>
+<article style="border-radius: 16px; border: 1px solid #33232D; background: #180E13; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 28px 28px 20px">
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #F39C3D">class</p>
+<h3 style="margin: 8px 0 8px; font-size: 21px; font-weight: 600">Shared</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">Reference counted. <code>weak</code> back-references break cycles.</p>
+</div>
+<pre style="margin-top: auto; padding: 18px 28px; border-top: 1px solid #2A1C24; background: #0D0709; font-size: 13px; overflow-x: auto"><span class="k">public class</span> <span class="t">Node</span> &#123;
+    <span class="k">public</span> Children: <span class="t">List</span>&lt;<span class="t">Node</span>&gt; = [];
+    <span class="k">public</span> Parent: <span class="k">weak</span> <span class="t">Node</span>;
+&#125;</pre>
+</article>
+<article style="border-radius: 16px; border: 1px solid #33232D; background: #180E13; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 28px 28px 20px">
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #F39C3D">unique class</p>
+<h3 style="margin: 8px 0 8px; font-size: 21px; font-weight: 600">Owned</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">One owner, moved, never aliased. Cleanup runs exactly when the owner leaves scope.</p>
+</div>
+<pre style="margin-top: auto; padding: 18px 28px; border-top: 1px solid #2A1C24; background: #0D0709; font-size: 13px; overflow-x: auto"><span class="k">public unique class</span> <span class="t">TempFile</span> &#123;
+    <span class="k">public</span> Path: <span class="t">string</span>;
+    ~<span class="t">TempFile</span>() &#123; _ = <span class="t">File</span>.Delete(Path); &#125;
+&#125;</pre>
+</article>
+</div>
+</div>
+</section>
+
+<section style="border-top: 1px solid #2E1F28; background: #180E13">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Unions, options, results</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Say what can fail. Match on everything.</h2>
+<p style="margin: 20px 0 0; color: #D9CCD3"><code>T?</code> is an option, <code>Result&lt;T, E&gt;</code> carries errors, and <code>match</code> is checked for exhaustiveness. The <code>?</code> operator hands an error back to the caller in one character.</p>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre><span class="k">public union</span> <span class="t">Shape</span> &#123;
+    Circle(Radius: <span class="t">float</span>),
+    Rect(Width: <span class="t">float</span>, Height: <span class="t">float</span>),
+&#125;
+
+<span class="k">public static</span> Area(s: <span class="t">Shape</span>): <span class="t">float</span> =&gt; <span class="k">match</span> (s) &#123;
+    Circle(<span class="k">let</span> r) =&gt; <span class="t">MathF</span>.PI * r * r,
+    Rect(<span class="k">let</span> w, <span class="k">let</span> h) =&gt; w * h,
+&#125;;
+
+<span class="k">public static</span> Total(csv: <span class="t">string</span>): <span class="t">Result</span>&lt;<span class="t">int</span>, <span class="t">ParseError</span>&gt; &#123;
+    <span class="k">var</span> sum = 0;
+    <span class="k">foreach</span> (<span class="k">let</span> field <span class="k">in</span> csv.Split(<span class="s">','</span>)) &#123;
+        sum += <span class="t">int</span>.Parse(field.Trim())<span class="at">?</span>;
+    &#125;
+    <span class="k">return</span> sum;
+&#125;</pre>
+</div>
+</div>
+</section>
+
+<section style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap-reverse; gap: 56px; align-items: center">
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre><span class="k">public newtype</span> <span class="t">UserId</span> : <span class="t">long</span>;
+<span class="k">public newtype</span> <span class="t">OrderId</span> : <span class="t">long</span>;
+<span class="k">public newtype</span> <span class="t">Port</span> : <span class="t">int</span> <span class="k">is</span> &gt;= 1 <span class="k">and</span> &lt;= 65535;
+<span class="k">public newtype</span> <span class="t">Percent</span> : <span class="t">double</span> <span class="k">is</span> &gt;= 0.0 <span class="k">and</span> &lt;= 100.0;
+<span class="k">public newtype</span> <span class="t">Slug</span> : <span class="t">string</span> <span class="k">is</span> &#123; Length: &gt; 0 <span class="k">and</span> &lt;= 64 &#125;;</pre>
+</div>
+<div style="border-radius: 12px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 16px 24px">
+<pre style="font-size: 13px"><span class="k">let</span> port: <span class="t">Port</span> = 70000;
+<span style="color: #FF8C78">error[MR0260]</span>: 70000 is not a valid `Port` (requires `&gt;= 1 and &lt;= 65535`)</pre>
+</div>
+</div>
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Newtypes</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Types that carry their own rules.</h2>
+<p style="margin: 20px 0 0; color: #D9CCD3">A <code>UserId</code> is never mistaken for an <code>OrderId</code>, though both are <code>long</code> underneath and cost nothing extra. A refinement is checked once, where a value is created, and constants are checked at compile time. Code that receives a <code>Port</code> never checks it again.</p>
+</div>
+</div>
+</section>
+
+<section style="border-top: 1px solid #2E1F28; background: #180E13">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Effects</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Know what every function can touch.</h2>
+<p style="margin: 20px 0 0; color: #D9CCD3">The compiler infers each function's capabilities with no annotations to write. Hover shows them, <code>uses</code> states a bound the compiler checks, and <code>mora explain-effects</code> prints the call path behind each one.</p>
+<ul style="margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px">
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">fs.read</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">fs.write</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">net.outbound</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">net.listen</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">env</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">clock</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">random</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">process</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">ffi</li>
+</ul>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre><span class="k">public class</span> <span class="t">PriceService</span> &#123;
+    <span class="k">private</span> _rates: <span class="t">RateClient</span>;
+
+    <span class="c">// No annotation: hover shows `uses (net.outbound, clock)`</span><span class="k">
+    public async</span> PriceCents(order: <span class="t">Order</span>): <span class="t">Result</span>&lt;<span class="t">int</span>, <span class="t">PricingError</span>&gt; &#123;
+        <span class="k">let</span> rate = <span class="k">await</span> _rates.Get(order.Currency, <span class="t">Clock</span>.Now())<span class="at">?</span>;
+        <span class="k">return</span> <span class="t">Pricing</span>.Apply(order.TotalCents, rate);
+    &#125;
+&#125;
+
+<span class="k">public static class</span> <span class="t">Pricing</span> &#123;
+    <span class="c">// A checked bound: reading Clock.Now() here is error MR0250</span><span class="k">
+    public static</span> Apply(cents: <span class="t">int</span>, rate: <span class="t">Rate</span>): <span class="t">int</span> <span class="k">uses none</span> &#123;
+        <span class="k">return</span> cents * rate.Numerator / rate.Denominator;
+    &#125;
+&#125;</pre>
+</div>
+<div style="border-radius: 12px; border: 1px solid #33232D; background: #110A0D; overflow-x: auto; padding: 14px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8">
+<div style="white-space: nowrap"><span style="color: #9A8892">$</span> mora explain-effects PriceService.PriceCents</div>
+<div style="white-space: nowrap; color: #B8A9B1">clock &lt;- Clock.Now at src/Price.mr:12</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+<div style="display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-start">
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Macros</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Macros are just Mora.</h2>
+<p style="margin: 20px 0 0; color: #D9CCD3">A macro is ordinary Mora code that runs at compile time, in a sandbox, on a typed model of your program. You can see and test what it expands to. The standard library's own macros are written the same way.</p>
+<ul style="margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px">
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Json</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Equatable</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Hashable</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Comparable</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Display</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Error</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">@Observable</li>
+<li style="padding: 4px 10px; border-radius: 8px; background: #22101C; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #EBA6CF">#Assert</li>
+</ul>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre><span class="k">public macro</span> <span class="t">Equatable</span>(t: <span class="t">Type</span>) <span class="k">adds</span> <span class="t">IEquatable</span>&lt;$t&gt; &#123;
+    <span class="k">let</span> checks = t.Fields.Where(f =&gt; !f.IsWeak).Select(f =&gt; <span class="k">code</span>(<span class="k">this</span>.$f == other.$f));
+    <span class="k">return</span> <span class="k">code</span> &#123;
+        <span class="k">public</span> Equals(<span class="k">in</span> other: $t): <span class="t">bool</span> =&gt; $(checks.JoinWith(<span class="s">"&amp;&amp;"</span>, whenEmpty: <span class="k">code</span>(<span class="k">true</span>)));
+    &#125;;
+&#125;</pre>
+</div>
+<div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre><span class="at">@Equatable</span><span class="k">
+public class</span> <span class="t">Point</span> &#123;
+    <span class="k">public</span> X: <span class="t">int</span>;
+    <span class="k">public</span> Y: <span class="t">int</span>;
+
+    <span class="k">public</span> <span class="t">Point</span>(x: <span class="t">int</span>, y: <span class="t">int</span>) &#123;
+        X = x;
+        Y = y;
+    &#125;
+&#125;
+
+<span class="t">Console</span>.WriteLine(<span class="k">new</span> <span class="t">Point</span>(1, 2) == <span class="k">new</span> <span class="t">Point</span>(1, 2));  <span class="c">// True</span></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="border-top: 1px solid #2E1F28; background: #180E13">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Async and concurrency</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Concurrent work that cleans up after itself.</h2>
+<ul style="margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; color: #D9CCD3">
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Scopes fail fast.</strong> When one child task fails, its siblings are cancelled and the error comes back. A failure is never lost in a task nobody awaits.</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Deadlines are inherited.</strong> Every HTTP request gets one, and everything it awaits stops at it, with no deadline parameter in any signature.</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Cancelling is dropping.</strong> A dropped future runs the destructors of what it held, so cancellation is deterministic.</span></li>
+</ul>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre>app.MapGet(<span class="s">"/dashboard/&#123;id&#125;"</span>, <span class="k">async</span> (req: <span class="t">Request</span>) =&gt; &#123;
+    <span class="k">let</span> id = req.RouteValue&lt;<span class="t">UserId</span>&gt;(<span class="s">"id"</span>)<span class="at">?</span>;
+    <span class="k">return await</span> <span class="t">Task</span>.Scope(<span class="k">async</span> scope =&gt; &#123;
+        <span class="c">// Load and Recent return Result&lt;_, HttpError&gt;, the scope's error type</span><span class="k">
+        let</span> profile = scope.Spawn(_profiles.Load(id));
+        <span class="k">let</span> orders = scope.Spawn(_orders.Recent(id));     <span class="c">// an Err here cancels the profile load</span><span class="k">
+        let</span> dashboard = <span class="k">new</span> <span class="t">Dashboard</span> &#123; Profile = <span class="k">await</span> profile<span class="at">?</span>, Orders = <span class="k">await</span> orders<span class="at">?</span> &#125;;
+        <span class="k">return</span> Ok(<span class="t">Results</span>.Json(dashboard));
+    &#125;);
+&#125;);</pre>
+</div>
+</div>
+</section>
+
+<section id="services" style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Dependency injection</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Services wired at compile time.</h2>
+<p style="margin: 20px 0 0; color: #D9CCD3">A <code>services</code> block says which implementation stands for each service and how long it lives. The compiler checks the whole graph along with the rest of the program and generates the constructor calls you would write by hand, so every call between services is direct.</p>
+<ul style="margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; color: #D9CCD3">
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Constructors are the wiring.</strong> A class lists its dependencies in its one constructor. A handler takes the services it needs as parameters.</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Mistakes are build errors.</strong> A missing binding, a cycle or a singleton that holds a scoped service fails <code>mora check</code> and shows in the editor, with the chain that leads to it.</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Tests swap services.</strong> A test composition inherits the app's and overrides what it fakes, and <code>uses none</code> proves the test never reaches the network or the disk.</span></li>
+</ul>
+<ul style="margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px">
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">singleton</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">scoped</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">transient</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">decorate</li>
+<li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">override</li>
+</ul>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre><span class="c">// src/Services.mr</span><span class="k">
+services</span> <span class="t">Storage</span> &#123;
+    <span class="k">scoped</span> <span class="t">IUserStore</span> = <span class="t">SqlUserStore</span>;
+    <span class="k">decorate</span> <span class="t">IUserStore</span> <span class="k">with</span> <span class="t">CachingUserStore</span>;
+&#125;
+
+<span class="k">services</span> <span class="t">AppBase</span> : <span class="t">Storage</span> &#123;
+    <span class="k">scoped</span> <span class="t">IAuditLog</span> = <span class="t">FileAuditLog</span>;
+    <span class="k">transient</span> <span class="t">WelcomeMail</span>;                      <span class="c">// a class bound to itself</span><span class="k">
+    singleton</span> <span class="t">IMailer</span>;                          <span class="c">// a requirement: every final block binds it</span><span class="k">
+    singleton</span> <span class="t">IHealthCheck</span> += <span class="t">DbCheck</span>;
+    <span class="k">singleton</span> <span class="t">IHealthCheck</span> += <span class="t">DiskCheck</span>;
+&#125;
+
+<span class="at">@Cfg</span>(Debug = <span class="k">true</span>)
+<span class="k">services</span> <span class="t">App</span> : <span class="t">AppBase</span> &#123;
+    <span class="k">override singleton</span> <span class="t">IMailer</span> = <span class="t">ConsoleMailer</span>;
+&#125;
+
+<span class="at">@Cfg</span>(Debug = <span class="k">false</span>)
+<span class="k">services</span> <span class="t">App</span> : <span class="t">AppBase</span> &#123;
+    <span class="k">override singleton</span> <span class="t">IMailer</span> = <span class="t">SmtpMailer</span>;
+&#125;</pre>
+</div>
+<div style="border-radius: 12px; border: 1px solid #33232D; background: #110A0D; overflow-x: auto; padding: 14px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8">
+<div style="white-space: nowrap"><span style="color: #FF8C78; font-weight: 500">MR0705</span> <span style="color: #9A8892">prints the chain</span></div>
+<div style="white-space: nowrap; color: #B8A9B1">singleton `ReportCache` depends on scoped `DbSession` through transient `ReportQuery`</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Standard library</p>
+<h2 style="margin: 16px 0 0; max-width: 20em; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">One library, layered by what the platform provides.</h2>
+<p style="margin: 20px 0 0; max-width: 40em; color: #D9CCD3">Nothing in the compiler, runtime or standard library assumes an operating system, a CPU or a byte order. Each layer asks only for what it needs, so the same language fits a device with no OS, a game engine, a command-line tool or a server.</p>
+<ol style="margin: 48px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px">
+<li style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #F39C3D">Std.Core</p>
+<p style="margin: 6px 0 0; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: #9A8892">Needs nothing</p>
+<p style="margin: 14px 0 0; font-size: 16px; color: #B8A9B1">Primitives, <code>Option</code>, <code>Result</code>, spans, text formatting into caller buffers, interfaces and the macro model.</p>
+</li>
+<li style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #F39C3D">Std.Alloc</p>
+<p style="margin: 6px 0 0; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: #9A8892">Needs a heap</p>
+<p style="margin: 14px 0 0; font-size: 16px; color: #B8A9B1">Strings, arrays, collections, LINQ, JSON, futures and the executor.</p>
+</li>
+<li style="padding: 28px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #F39C3D">Std</p>
+<p style="margin: 6px 0 0; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: #9A8892">Needs what each API is tagged with</p>
+<p style="margin: 14px 0 0; font-size: 16px; color: #B8A9B1"><code>Console</code> needs <code>stdio</code>, <code>File</code> needs <code>fs</code>, <code>TcpListener</code> needs <code>net</code>. Also clock, random, process and environment.</p>
+</li>
+</ol>
+<div style="margin-top: 20px; border-radius: 12px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #FF8C78; white-space: nowrap">error[MR0510]</span>
+<span style="font-size: 15px; color: #B8A9B1">Using an API the target can't provide is a compile-time error that names the API, the capability and the target, not a link failure.</span>
+</div>
+<div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 20px">
+<article style="border-radius: 16px; border: 1px solid #33232D; background: #180E13; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 24px 28px 18px"><h3 style="margin: 0 0 6px; font-size: 19px; font-weight: 600">Errors with context</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">Libraries return typed errors. Applications wrap them in a <code>Report</code> that says what was happening when it failed.</p></div>
+<pre style="margin-top: auto; padding: 18px 28px; border-top: 1px solid #2A1C24; background: #0D0709; font-size: 13px; overflow-x: auto">LoadConfig(path: <span class="t">string</span>): <span class="t">Result</span>&lt;<span class="t">Config</span>, <span class="t">Report</span>&gt; &#123;
+    <span class="k">let</span> text = <span class="t">File</span>.ReadAllText(path).Context(() =&gt; <span class="s">$"reading config &#123;path&#125;"</span>)<span class="at">?</span>;
+    <span class="k">let</span> config = <span class="t">Json</span>.Deserialize&lt;<span class="t">Config</span>&gt;(text).Context(<span class="s">"parsing the config"</span>)<span class="at">?</span>;
+    <span class="k">return</span> config;
+&#125;</pre>
+</article>
+<article style="border-radius: 16px; border: 1px solid #33232D; background: #180E13; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 24px 28px 18px"><h3 style="margin: 0 0 6px; font-size: 19px; font-weight: 600">Tests next to the code</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">A <code>test</code> section sits beside what it tests. Snapshots, doc-comment examples and leak checks are part of <code>mora test</code>.</p></div>
+<pre style="margin-top: auto; padding: 18px 28px; border-top: 1px solid #2A1C24; background: #0D0709; font-size: 13px; overflow-x: auto"><span class="k">test</span> &#123;
+    <span class="at">@Test</span>
+    EmptyOrderTotalsZero() &#123;
+        <span class="k">let</span> order = <span class="k">new</span> <span class="t">Order</span> &#123; Lines = [] &#125;;
+        <span class="k">let</span> zero: <span class="t">Cents</span> = 0;
+        <span class="t">Assert</span>.Equal(zero, order.Total());
+    &#125;
+&#125;</pre>
+</article>
+</div>
+</div>
+</section>
+
+<section id="toolchain" style="border-top: 1px solid #2E1F28; background: #180E13">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-start">
+<div style="flex: 1 1 380px; min-width: 0">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">Toolchain</p>
+<h2 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">One <span style="font-family: 'JetBrains Mono', monospace; color: #FFD27A">mora</span> for everything.</h2>
+<p style="margin: 20px 0 0; color: #D9CCD3">Compiler, formatter, test runner, REPL and language server ship as one executable, installed with one command. The VS Code extension brings diagnostics, hover types, go-to-definition and quick fixes.</p>
+<p style="margin: 16px 0 0; color: #D9CCD3">Every error code has a page with a failing example and a fixed one, and the test suite compiles both, so explanations never go stale.</p>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; border-radius: 16px; border: 1px solid #33232D; background: #0D0709; overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 15px">
+<caption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">mora commands</caption>
+<tbody>
+<tr><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora new</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Start an app, a library or a web service</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora run</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Build and run</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora check --watch</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Every check, again after each change</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora test --seed</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Run tests, or replay a failing run exactly</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora fix</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Apply the compiler's safe fixes</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora fmt</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">One canonical layout, no configuration</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora repl</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Try code interactively, compiled to machine code</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora explain MR0310</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">The full explanation of an error, with a fix</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora explain-cost</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Every heap allocation, and why it happens</td></tr>
+<tr style="border-top: 1px solid #2A1C24"><th scope="row" style="padding: 12px 24px; text-align: left; font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #FFD27A; white-space: nowrap">mora bench</th><td style="padding: 12px 24px 12px 0; color: #B8A9B1">Time plus exact allocation counts</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="next" style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+<p style="margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D">After v0.1</p>
+<h2 style="margin: 16px 0 0; max-width: 20em; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Where Mora goes next.</h2>
+<p style="margin: 20px 0 0; max-width: 40em; color: #D9CCD3">The language is designed for these from the start, so they arrive without changing what you already wrote.</p>
+
+<article style="margin-top: 48px; border-radius: 16px; border: 1px solid #4A0E3B; background: #1A0D15; display: flex; flex-wrap: wrap; overflow: hidden">
+<div style="flex: 1 1 340px; min-width: 0; padding: 28px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #3A1530; color: #FFD27A">v0.3</span>
+<h3 style="margin: 14px 0 8px; font-size: 21px; font-weight: 600">Contracts and property tests</h3>
+<p style="margin: 0; font-size: 16px; color: #B8A9B1">A <code>contract</code> section states each member's rules away from the signature: invariants, preconditions, declared failures and postconditions. Property tests are generated from the same rules, with shrinking on failure.</p>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; background: #0D0709; overflow-x: auto; padding: 24px">
+<pre style="font-size: 13px">    <span class="k">contract</span> &#123;
+        <span class="k">invariant</span> Balance &gt;= 0;
+
+        Withdraw &#123;
+            <span class="k">fails with</span> <span class="t">AccountError</span>.Frozen <span class="k">when</span> IsFrozen;
+            <span class="k">fails with</span> <span class="t">AccountError</span>.Insufficient <span class="k">when</span> amount &gt; Balance;
+            <span class="k">ensures</span> Balance == old(Balance) - amount;
+        &#125;
+    &#125;</pre>
+</div>
+</article>
+
+<div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 20px">
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.2</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Libraries as WebAssembly</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1">A library ships as one <code>.wasm</code> file with its metadata and typed IR, for wasm and native programs alike. Plugins load natively or sandboxed from one interface.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.2</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Capability grants</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1">Give each dependency only the capabilities it needs, checked from inferred effects, and run programs in a sandbox that enforces them.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.2</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Tools for agents</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1"><code>mora mcp</code> serves queries, context, checks and fixes to coding agents. Mark a function <code>@Tool</code> and its signature becomes an MCP tool.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.2</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Semver the compiler checks</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1"><code>mora diff</code> reports the smallest version bump a change needs, and <code>mora publish</code> refuses one that is too small.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.3</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Simulation, replay, hot reload</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1">Test against a simulated world with a virtual clock and injected faults, record a run and replay it, and swap changed functions into a running program.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.3</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Units of measure</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1">Dimensions multiply and divide, so <code>Meters / Seconds</code> is a speed, and the cost falls only on code that declares units.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.4</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Threads</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1"><code>shared</code> classes, <code>Mutex</code>, <code>Channel</code> and a multi-threaded executor, with sendability checked at compile time.</p>
+</article>
+<article style="padding: 24px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #2A1C24; color: #FFD27A">v0.5</span>
+<h3 style="margin: 14px 0 6px; font-size: 18px; font-weight: 600">Registry and more targets</h3>
+<p style="margin: 0; font-size: 15px; color: #B8A9B1">A package registry with signed publishing, an LLVM release backend, and embedded devices with no OS.</p>
+</article>
+</div>
+</div>
+</section>
+
+<RoadmapTeaser />
+
+<section style="border-top: 1px solid #2E1F28">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 420px; min-width: 0">
+<img src="/brand/mora-mark.png" width="44" height="18" alt="" style="width: 132px; height: 54px; object-fit: contain">
+<h2 style="margin: 24px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.15">Follow Mora as it grows.</h2>
+<p style="margin: 16px 0 0; max-width: 32em; color: #D9CCD3">Nothing is ready to install yet. Watch the repository, or get one email when each release ships, from v0.1 onward.</p>
+</div>
+<Signup />
+</div>
+</section>
+</main>
+</Site>

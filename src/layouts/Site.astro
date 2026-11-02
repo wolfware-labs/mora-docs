@@ -1,0 +1,41 @@
+---
+import '../styles/site.css';
+import Header from '../components/landing/Header.astro';
+import Footer from '../components/landing/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  current?: 'roadmap';
+}
+
+const { title, description, current } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/png" href="/brand/mora-mark.png" />
+    <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mora" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body>
+    <div
+      style="background: #140B10; color: #F6EFE9; font-family: Figtree, system-ui, sans-serif; font-size: 17px; line-height: 1.6; min-height: 100vh"
+    >
+      <Header current={current} />
+      <slot />
+      <Footer />
+    </div>
+  </body>
+</html>

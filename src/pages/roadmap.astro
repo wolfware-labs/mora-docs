@@ -1,0 +1,124 @@
+---
+import Site from '../layouts/Site.astro';
+import { MILESTONE_NOTES, RELEASES } from '../data/releases';
+import { milestoneStatus, progress, roadmap, type Milestone } from '../lib/roadmap';
+
+const { asOf, milestones, explorations } = await roadmap();
+const byCode = new Map(milestones.map((m) => [m.code, m]));
+const lines = RELEASES.map((r) => ({
+  ...r,
+  milestones: r.milestones.map((code) => byCode.get(code)).filter((m): m is Milestone => m !== undefined),
+}));
+const asOfText = new Date(`${asOf}T00:00:00Z`).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+const closedText = (m: { closed: number; total: number }) => `${m.closed} of ${m.total} issues closed`;
+const STATUS = {
+  done: { label: 'Done', bg: '#1F3320', fg: '#8FD18F' },
+  'in-progress': { label: 'In progress', bg: '#3A2516', fg: '#FFD27A' },
+  planned: { label: 'Planned', bg: '#2A1C24', fg: '#B8A9B1' },
+};
+const chip = (first: boolean) =>
+  `display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid ${first ? '#5A3A2A' : '#33232D'}; ${first ? 'background: #1F1219; ' : 'color: #D9CCD3; '}font-family: 'JetBrains Mono', monospace; font-size: 14px; text-decoration: none`;
+const eyebrow = 'margin: 0; font-family: Unbounded, sans-serif; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: #F39C3D';
+const h2 = 'margin: 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: 28px';
+const grid = 'margin: 28px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px';
+---
+
+<Site
+  title="Roadmap · Mora"
+  description="Where Mora is headed: the milestones of each release line, with live progress from GitHub."
+  current="roadmap"
+>
+  <main style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 96px">
+    <p style={eyebrow}>Roadmap</p>
+    <h1 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(34px, 4.4vw, 54px); line-height: 1.08">Where Mora is headed.</h1>
+    <p style="margin: 20px 0 0; max-width: 44em; font-size: 18px; color: #D9CCD3">
+      Every deliverable is a GitHub issue. Progress below is a snapshot of the milestones as of <time datetime={asOf} data-testid="as-of">{asOfText}</time>; the site refreshes it on each deploy.
+    </p>
+    <ol style="margin: 32px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px">
+      {lines.map((r, i) => <li><a href={`#${r.id}`} style={chip(i === 0)}>{r.version}{r.label ? ` · ${r.label}` : ''}</a></li>)}
+      {explorations.length > 0 && <li><a href="#explore" style={chip(false)}>Explorations</a></li>}
+    </ol>
+
+    {
+      lines.map((r, i) => {
+        const p = progress(r.milestones);
+        const codes = r.milestones.map((m) => m.code);
+        const span = i === 0 ? `${r.label} · ${codes[0]} to ${codes[codes.length - 1]}` : codes.join(' · ');
+        return (
+          <section id={r.id} style="margin-top: 72px" data-testid={`release-${r.version}`}>
+            <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px">
+              <h2 style={h2}>{r.version} <span style="color: #9A8892; font-size: 18px">{span}</span></h2>
+              {i === 0 && <span style="color: #B8A9B1">{closedText(p)}</span>}
+            </div>
+            <p style="margin: 12px 0 0; max-width: 48em; color: #D9CCD3" set:html={r.summary} />
+            {i === 0 && (
+              <div role="img" aria-label={closedText(p)} style="margin-top: 16px; height: 8px; border-radius: 4px; background: #33232D">
+                <div style={`width: ${p.percent}%; height: 8px; border-radius: 4px; background: #F39C3D`} />
+              </div>
+            )}
+            <ol style={grid}>
+              {r.milestones.map((m) => {
+                const status = milestoneStatus(m);
+                const started = status !== 'planned';
+                const last = i === 0 && m === r.milestones[r.milestones.length - 1];
+                const mp = progress([m]);
+                const border = started ? '#5A3A2A' : last ? '#4A0E3B' : '#33232D';
+                const bg = started ? '#1F1219' : last ? '#22101C' : '#180E13';
+                const codeColor = started ? '#F39C3D' : last ? '#EBA6CF' : '#B8A9B1';
+                return (
+                  <li style={`padding: 22px 24px; border-radius: 14px; border: 1px solid ${border}; background: ${bg}; display: flex; flex-direction: column`} data-testid={`milestone-${m.code}`}>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+                      <span style={`font-family: 'JetBrains Mono', monospace; font-size: 14px; color: ${codeColor}`}>{m.code}</span>
+                      {i === 0 ? (
+                        <span style={`font-size: 13px; padding: 2px 10px; border-radius: 999px; background: ${STATUS[status].bg}; color: ${STATUS[status].fg}`}>{STATUS[status].label}</span>
+                      ) : (
+                        <a href={m.url} style="font-size: 14px">Issues</a>
+                      )}
+                    </div>
+                    <h3 style="margin: 8px 0 0; font-size: 18px; font-weight: 600">{m.name}</h3>
+                    {MILESTONE_NOTES[m.code] && <p style="margin: 6px 0 0; font-size: 15px; color: #B8A9B1" set:html={MILESTONE_NOTES[m.code]} />}
+                    {i === 0 ? (
+                      <div style="margin-top: auto; padding-top: 16px">
+                        <div role="img" aria-label={closedText(mp)} style="height: 6px; border-radius: 3px; background: #33232D">
+                          {mp.percent > 0 && <div style={`width: ${mp.percent}%; height: 6px; border-radius: 3px; background: #F39C3D`} />}
+                        </div>
+                        <div style="margin-top: 8px; display: flex; justify-content: space-between; font-size: 14px; color: #9A8892">
+                          <span>{closedText(mp)}</span>
+                          <a href={m.url}>Issues</a>
+                        </div>
+                      </div>
+                    ) : (
+                      m.issues.length > 0 && (
+                        <ul style="margin: 14px 0 0; padding: 0; list-style: none; font-size: 14px; display: flex; flex-direction: column; gap: 4px">
+                          {m.issues.map((issue) => <li><a href={issue.url}>#{issue.number} {issue.title}</a></li>)}
+                        </ul>
+                      )
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+            {i === lines.length - 1 && <p style="margin: 20px 0 0; font-size: 15px; color: #9A8892">Post-MVP milestones are broken into tasks when they start.</p>}
+          </section>
+        );
+      })
+    }
+
+    {
+      explorations.length > 0 && (
+        <section id="explore" style="margin-top: 72px; padding: 32px; border-radius: 16px; border: 1px solid #33232D; background: #180E13">
+          <h2 style="margin: 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: 24px">Explorations</h2>
+          <p style="margin: 12px 0 0; max-width: 48em; color: #D9CCD3">Ideas being evaluated, not yet assigned to a release.</p>
+          <ul style="margin: 20px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 10px 32px; font-size: 15px">
+            {explorations.map((issue) => <li><a href={issue.url}>#{issue.number} {issue.title}</a></li>)}
+          </ul>
+        </section>
+      )
+    }
+  </main>
+</Site>

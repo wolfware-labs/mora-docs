@@ -1,0 +1,33 @@
+---
+// The site header shared by the landing and roadmap pages.
+interface Props {
+  current?: 'roadmap';
+}
+
+const { current } = Astro.props;
+const link = 'color: #D9CCD3; text-decoration: none; padding: 10px 0';
+const active = 'color: #F39C3D; text-decoration: none; padding: 10px 0; font-weight: 600';
+---
+
+<header style="border-bottom: 1px solid #2E1F28">
+<div style="height: 3px; background: linear-gradient(90deg, #4A0E3B, #C0392B 40%, #F39C3D 75%, #FFD27A)"></div>
+<nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px">
+<a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #F6EFE9">
+<img src="/brand/mora-mark.png" width="44" height="18" alt="" style="width: 44px; height: 18px; object-fit: contain">
+<span style="font-family: Unbounded, sans-serif; font-weight: 600; font-size: 17px; letter-spacing: 0.28em">MORA</span>
+</a>
+<div style="display: flex; flex-wrap: wrap; gap: 4px 24px; flex: 1 1 auto; font-size: 15px">
+<a href="/docs/" style="color: #D9CCD3; text-decoration: none; padding: 10px 0">Docs</a>
+<a href="/#features" style="color: #D9CCD3; text-decoration: none; padding: 10px 0">Features</a>
+<a href="/#toolchain" style="color: #D9CCD3; text-decoration: none; padding: 10px 0">Toolchain</a>
+<a href="/roadmap/" aria-current={current === 'roadmap' ? 'page' : undefined} style={current === 'roadmap' ? active : link}>Roadmap</a>
+<a href="https://github.com/wolfware-labs/mora-lang/blob/main/docs/design/mora.md" style="color: #D9CCD3; text-decoration: none; padding: 10px 0">Spec</a>
+</div>
+<div style="display: flex; gap: 12px; align-items: center">
+<a href="https://github.com/wolfware-labs/mora-lang" aria-label="Mora on GitHub" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 10px; border: 1px solid #3A2833; color: #F6EFE9">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"></path></svg>
+</a>
+<a href="/docs/" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 10px; background: #F39C3D; color: #1A0E12; font-weight: 600; font-size: 15px; text-decoration: none">Read the docs</a>
+</div>
+</nav>
+</header>

@@ -1,0 +1,112 @@
+{
+  "name": "mora",
+  "scopeName": "source.mora",
+  "fileTypes": [
+    "mr"
+  ],
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "include": "#attribute"
+    },
+    {
+      "include": "#number"
+    },
+    {
+      "include": "#keyword"
+    },
+    {
+      "include": "#type"
+    },
+    {
+      "include": "#operator"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.mora",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.mora",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "string": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.mora",
+          "begin": "\\$?\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.mora",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.mora",
+          "match": "'(\\\\.|[^'\\\\])'"
+        }
+      ]
+    },
+    "attribute": {
+      "patterns": [
+        {
+          "name": "entity.name.function.macro.mora",
+          "match": "[@#][A-Z][A-Za-z0-9_]*"
+        }
+      ]
+    },
+    "number": {
+      "patterns": [
+        {
+          "name": "constant.numeric.mora",
+          "match": "\\b(0x[0-9A-Fa-f_]+|0b[01_]+|[0-9][0-9_]*(\\.[0-9_]+)?([eE][+-]?[0-9]+)?)([uUlLfFdD]|ul|UL)?\\b"
+        }
+      ]
+    },
+    "keyword": {
+      "patterns": [
+        {
+          "name": "keyword.control.mora",
+          "match": "\\b(abstract|as|async|await|break|const|continue|default|do|else|enum|extern|false|for|foreach|if|import|in|indirect|interface|internal|is|lazy|let|macro|match|move|mut|new|none|operator|out|params|private|public|ref|return|shared|sizeof|stackalloc|static|struct|switch|this|true|union|unique|unsafe|using|var|weak|where|while|yield)\\b"
+        },
+        {
+          "name": "keyword.other.contextual.mora",
+          "match": "\\b(get|set|value|stored|uses|when|and|or|not|with|file|nameof|global|args|code|adds|from|type|allows|any|newtype|extension|test|contract|invariant|requires|fails|ensures|also|old|result|services|singleton|scoped|transient|per|override|decorate|class)\\b"
+        }
+      ]
+    },
+    "type": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.mora",
+          "match": "\\b(bool|byte|char|double|float|int|long|nint|nuint|sbyte|short|string|uint|ulong|ushort)\\b"
+        },
+        {
+          "name": "entity.name.type.mora",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "operator": {
+      "patterns": [
+        {
+          "name": "keyword.operator.try.mora",
+          "match": "\\?(?![?.])"
+        }
+      ]
+    }
+  }
+}

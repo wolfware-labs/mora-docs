@@ -1,0 +1,419 @@
+{
+  "asOf": "2026-11-02",
+  "milestones": [
+    {
+      "number": 1,
+      "code": "M0",
+      "name": "Foundations",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/1",
+      "open": 1,
+      "closed": 21,
+      "issues": []
+    },
+    {
+      "number": 2,
+      "code": "M1",
+      "name": "Hello, native",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/2",
+      "open": 15,
+      "closed": 16,
+      "issues": []
+    },
+    {
+      "number": 3,
+      "code": "M2",
+      "name": "Memory model",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/3",
+      "open": 16,
+      "closed": 0,
+      "issues": []
+    },
+    {
+      "number": 4,
+      "code": "M3",
+      "name": "Expressive core",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/4",
+      "open": 19,
+      "closed": 0,
+      "issues": []
+    },
+    {
+      "number": 5,
+      "code": "M4",
+      "name": "Macros",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/5",
+      "open": 10,
+      "closed": 0,
+      "issues": []
+    },
+    {
+      "number": 6,
+      "code": "M5",
+      "name": "Standard library core",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/6",
+      "open": 19,
+      "closed": 0,
+      "issues": []
+    },
+    {
+      "number": 7,
+      "code": "M6",
+      "name": "Async and HTTP",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/7",
+      "open": 10,
+      "closed": 0,
+      "issues": []
+    },
+    {
+      "number": 8,
+      "code": "M7",
+      "name": "Developer experience and v0.1",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/8",
+      "open": 14,
+      "closed": 0,
+      "issues": []
+    },
+    {
+      "number": 9,
+      "code": "M8",
+      "name": "WebAssembly and libraries",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/9",
+      "open": 2,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 10,
+          "title": "M8: WebAssembly and libraries",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/10"
+        },
+        {
+          "number": 184,
+          "title": "Stable plugin ABI at an opt-in boundary",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/184"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "code": "M9",
+      "name": "Packages and capabilities",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/10",
+      "open": 2,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 11,
+          "title": "M9: Packages and capabilities",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/11"
+        },
+        {
+          "number": 185,
+          "title": "Capability grants narrowed per dependency, and sandboxed runs",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/185"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "code": "M10",
+      "name": "Threads",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/11",
+      "open": 3,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 12,
+          "title": "M10: Threads",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/12"
+        },
+        {
+          "number": 186,
+          "title": "Supervised worker processes as a framework option",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/186"
+        },
+        {
+          "number": 215,
+          "title": "Explore: reference-count atomicity by marking on send",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/215"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "code": "M11",
+      "name": "Language growth",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/12",
+      "open": 3,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 13,
+          "title": "M11: Language growth",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/13"
+        },
+        {
+          "number": 187,
+          "title": "Conditionally async higher-order functions (`async?`)",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/187"
+        },
+        {
+          "number": 188,
+          "title": "`decimal` and currency-safe money",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/188"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "code": "M12",
+      "name": "Registry and signing",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/13",
+      "open": 1,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 14,
+          "title": "M12: Registry and signing",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/14"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "code": "M13",
+      "name": "Backends and targets",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/14",
+      "open": 2,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 15,
+          "title": "M13: Backends and targets",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/15"
+        },
+        {
+          "number": 189,
+          "title": "LLVM release backend that no guarantee depends on",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/189"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "code": "M14",
+      "name": "Contracts and checked types",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/15",
+      "open": 6,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 179,
+          "title": "M14: Contracts and checked types",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/179"
+        },
+        {
+          "number": 190,
+          "title": "Contract sections",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/190"
+        },
+        {
+          "number": 191,
+          "title": "`where` predicates on newtypes",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/191"
+        },
+        {
+          "number": 192,
+          "title": "Property tests generated from types and contracts",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/192"
+        },
+        {
+          "number": 193,
+          "title": "Unit algebra",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/193"
+        },
+        {
+          "number": 194,
+          "title": "Compile-time evaluation of effect-free functions",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/194"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "code": "M15",
+      "name": "Test and run tooling",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/16",
+      "open": 5,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 180,
+          "title": "M15: Test and run tooling",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/180"
+        },
+        {
+          "number": 195,
+          "title": "Simulated World for deterministic simulation testing",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/195"
+        },
+        {
+          "number": 196,
+          "title": "Sound test caching and flaky-test triage from effects",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/196"
+        },
+        {
+          "number": 197,
+          "title": "Record and replay (`mora run --record`, `mora replay`)",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/197"
+        },
+        {
+          "number": 198,
+          "title": "Hot reload of function bodies in dev builds",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/198"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "code": "M16",
+      "name": "Agent tooling and API evolution",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/17",
+      "open": 5,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 181,
+          "title": "M16: Agent tooling and API evolution",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/181"
+        },
+        {
+          "number": 199,
+          "title": "`mora query`, `mora context` and `mora mcp`",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/199"
+        },
+        {
+          "number": 200,
+          "title": "JSON Schema from types and `@Tool` signatures as MCP tools",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/200"
+        },
+        {
+          "number": 201,
+          "title": "Semantic diff and compiler-checked semver",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/201"
+        },
+        {
+          "number": 202,
+          "title": "Editions and `mora migrate`",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/202"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "code": "M17",
+      "name": "Standard library growth",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/18",
+      "open": 4,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 182,
+          "title": "M17: Standard library growth",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/182"
+        },
+        {
+          "number": 203,
+          "title": "Time zones and the tz database",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/203"
+        },
+        {
+          "number": 204,
+          "title": "Typed configuration with `@Config`",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/204"
+        },
+        {
+          "number": 205,
+          "title": "`Retry` policies, `@CancelSafe` and `Task.Shield`",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/205"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "code": "M18",
+      "name": "Optimizer",
+      "url": "https://github.com/wolfware-labs/mora-lang/milestone/19",
+      "open": 6,
+      "closed": 0,
+      "issues": [
+        {
+          "number": 183,
+          "title": "M18: Optimizer",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/183"
+        },
+        {
+          "number": 206,
+          "title": "General reuse when unique",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/206"
+        },
+        {
+          "number": 207,
+          "title": "Merge identical MIR bodies",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/207"
+        },
+        {
+          "number": 208,
+          "title": "`Vector128<T>` for Mora code",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/208"
+        },
+        {
+          "number": 209,
+          "title": "Closed-world devirtualization of `any I` and function values",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/209"
+        },
+        {
+          "number": 210,
+          "title": "Checked `@NoAlloc` and `scoped`",
+          "url": "https://github.com/wolfware-labs/mora-lang/issues/210"
+        }
+      ]
+    }
+  ],
+  "explorations": [
+    {
+      "number": 211,
+      "title": "Explore: small plain values stored inline in `any I` values",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/211"
+    },
+    {
+      "number": 212,
+      "title": "Explore: substring sharing with a bounded-waste rule",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/212"
+    },
+    {
+      "number": 213,
+      "title": "Explore: inferred task-local allocation regions",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/213"
+    },
+    {
+      "number": 214,
+      "title": "Explore: return `Result` and options in registers",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/214"
+    },
+    {
+      "number": 216,
+      "title": "Explore: profile-guided optimization from tests and benchmarks",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/216"
+    },
+    {
+      "number": 217,
+      "title": "Explore: `@Soa` macro for opt-in struct-of-arrays lists",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/217"
+    },
+    {
+      "number": 218,
+      "title": "Explore: production flight recorder",
+      "url": "https://github.com/wolfware-labs/mora-lang/issues/218"
+    }
+  ]
+}

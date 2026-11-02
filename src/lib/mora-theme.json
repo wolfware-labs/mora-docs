@@ -1,0 +1,85 @@
+{
+  "name": "mora-dark",
+  "type": "dark",
+  "colors": {
+    "editor.background": "#0D0709",
+    "editor.foreground": "#F6EFE9",
+    "editorLineNumber.foreground": "#5A4652"
+  },
+  "tokenColors": [
+    {
+      "scope": [
+        "comment"
+      ],
+      "settings": {
+        "foreground": "#9A8892"
+      }
+    },
+    {
+      "scope": [
+        "keyword",
+        "storage.modifier",
+        "constant.language"
+      ],
+      "settings": {
+        "foreground": "#F39C3D"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.type",
+        "storage.type",
+        "support.type",
+        "entity.name.class"
+      ],
+      "settings": {
+        "foreground": "#FFD27A"
+      }
+    },
+    {
+      "scope": [
+        "string",
+        "constant.character"
+      ],
+      "settings": {
+        "foreground": "#EBA6CF"
+      }
+    },
+    {
+      "scope": [
+        "keyword.operator.try.mora",
+        "entity.name.function.macro",
+        "meta.attribute",
+        "entity.other.attribute-name"
+      ],
+      "settings": {
+        "foreground": "#FF8C78"
+      }
+    },
+    {
+      "scope": [
+        "constant.numeric"
+      ],
+      "settings": {
+        "foreground": "#F6EFE9"
+      }
+    },
+    {
+      "scope": [
+        "markup.inserted"
+      ],
+      "settings": {
+        "foreground": "#8FD18F"
+      }
+    },
+    {
+      "scope": [
+        "markup.deleted",
+        "invalid"
+      ],
+      "settings": {
+        "foreground": "#FF8C78"
+      }
+    }
+  ]
+}

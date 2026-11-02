@@ -1,0 +1,66 @@
+/* Base styles for the pages outside Starlight: the landing page and the roadmap. */
+@import '@fontsource/unbounded/400.css';
+@import '@fontsource/unbounded/500.css';
+@import '@fontsource/unbounded/600.css';
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/500.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: #140b10;
+}
+a {
+  color: #ffd27a;
+}
+a:hover {
+  color: #ffe3a8;
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #ffd27a;
+  outline-offset: 3px;
+}
+pre,
+code {
+  /* `=>` stays two characters, as typed. */
+  font-variant-ligatures: none;
+}
+pre {
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #f6efe9;
+}
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  color: #ffd27a;
+}
+.k {
+  color: #f39c3d;
+}
+.t {
+  color: #ffd27a;
+}
+.s {
+  color: #eba6cf;
+}
+.c {
+  color: #9a8892;
+}
+.at {
+  color: #ff8c78;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
