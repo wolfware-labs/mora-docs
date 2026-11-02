@@ -1,6 +1,6 @@
 # mora-docs
 
-The website for the [Mora programming language](https://github.com/wolfware-labs/mora-lang): the landing page, the roadmap and the documentation at [mora-lang.dev](https://mora-lang.dev). Built with Astro and Starlight.
+The website for the [Mora programming language](https://github.com/wolfware-labs/mora-lang): the landing page, the roadmap and the documentation at [moralang.org](https://moralang.org). Built with Astro and Starlight.
 
 ## Where the content comes from
 

@@ -59,7 +59,7 @@ test('llms.txt lists the docs', async ({ request }) => {
   expect(res.ok()).toBe(true);
   const text = await res.text();
   expect(text).toMatch(/^# Mora/);
-  expect(text).toContain('[Dependency injection](https://mora-lang.dev/docs/language/dependency-injection/)');
+  expect(text).toContain('[Dependency injection](https://moralang.org/docs/language/dependency-injection/)');
 });
 
 for (const path of ['/', '/roadmap/', '/docs/memory/ownership/']) {
