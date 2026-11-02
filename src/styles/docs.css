@@ -31,6 +31,7 @@
   --sl-color-bg-sidebar: #140b10;
   --sl-color-hairline: #33232d;
   --sl-color-hairline-light: #2e1f28;
+  --sl-color-hairline-shade: #2e1f28;
   --sl-color-text-accent: #f39c3d;
   --mora-code-inline-bg: #24161d;
   --mora-code-inline: #ffd27a;
@@ -71,10 +72,8 @@
   --sl-color-blue-high: #4a0e3b;
 }
 
-/* The brand stripe under the header, as on the landing page. */
-.header {
-  border-bottom: 1px solid var(--sl-color-hairline);
-}
+/* The brand stripe along the top of the header, as on the landing page. Only the outer
+   <header> (.page > .header) matches: Starlight's inner row is a div.header too. */
 .page > .header::before {
   content: '';
   position: absolute;
