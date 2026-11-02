@@ -95,11 +95,6 @@ export function renameSwitch(markdown) {
   return mapCode(markdown, (code) => code.replace(/\bswitch\b/g, 'match'));
 }
 
-/** The site is served at moralang.org; the spec still names the old domain in places such as §19.3. */
-export function renameDomain(markdown) {
-  return markdown.replace(/\bmora-lang\.dev\b/g, 'moralang.org');
-}
-
 /**
  * Links every `§10.4` in prose: to the docs page that shows that section when there is one,
  * otherwise to the spec on GitHub. `where(number)` returns the docs URL or undefined.
@@ -170,7 +165,7 @@ export function buildPage(page, sections, where, order) {
   const fields = { title: page.title, description: page.description };
   if (order !== undefined) fields.sidebar = { order };
   // Shiki has no EBNF grammar; the fragments read fine as plain text.
-  const body = linkSectionRefs(renameSwitch(renameDomain(text)), sections, where).replace(/^```ebnf$/gm, '```text');
+  const body = linkSectionRefs(renameSwitch(text), sections, where).replace(/^```ebnf$/gm, '```text');
   return `${frontmatter(fields)}\n${body}\n\n---\n\nFrom the specification: ${sources.join(', ')}.\n`;
 }
 
@@ -181,7 +176,7 @@ export function buildPage(page, sections, where, order) {
 export function buildErrorPage(code, markdown, sections, where, errorUrl) {
   const [first, ...rest] = markdown.split('\n');
   const summary = first.replace(/^#\s*MR\d{4}:\s*/, '').trim();
-  const body = linkSectionRefs(renameSwitch(renameDomain(absoluteLinks(rest.join('\n').trim(), errorUrl))), sections, where);
+  const body = linkSectionRefs(renameSwitch(absoluteLinks(rest.join('\n').trim(), errorUrl)), sections, where);
   return `${frontmatter({ title: code, description: summary })}\n**${summary}**\n\n${body}\n\n---\n\nSource: [${code}.md](${ERRORS_URL}${code}.md).\n`;
 }
 

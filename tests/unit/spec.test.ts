@@ -5,7 +5,6 @@ import {
   githubSlug,
   linkSectionRefs,
   parseSpec,
-  renameDomain,
   renameSwitch,
 } from '../../scripts/lib/spec.mjs';
 
@@ -54,12 +53,6 @@ describe('renameSwitch', () => {
   it('renames the keyword in code and keeps the English verb in prose', () => {
     const text = 'A `switch` over it.\nStrings switch on first send.\n```mora\nreturn switch (x) {\n```';
     expect(renameSwitch(text)).toBe('A `match` over it.\nStrings switch on first send.\n```mora\nreturn match (x) {\n```');
-  });
-});
-
-describe('renameDomain', () => {
-  it('points the old domain at moralang.org, in code too', () => {
-    expect(renameDomain('`curl -fsSL https://mora-lang.dev/install.sh | sh`')).toBe('`curl -fsSL https://moralang.org/install.sh | sh`');
   });
 });
 
