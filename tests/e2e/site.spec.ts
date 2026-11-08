@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import snapshot from '../../src/data/roadmap.snapshot.json' with { type: 'json' };
 import { RELEASES } from '../../src/data/releases';
 import { progress } from '../../src/lib/roadmap';
+import { INTRO, POINTS, plain } from '../../src/data/pitch';
 
 const mvp = snapshot.milestones.filter((m) => RELEASES[0].milestones.includes(m.code));
 const mvpProgress = progress(mvp);
@@ -103,6 +104,22 @@ test('llms.txt lists the docs', async ({ request }) => {
   const text = await res.text();
   expect(text).toMatch(/^# Mora/);
   expect(text).toContain('[Dependency injection](https://moralang.org/docs/language/dependency-injection/)');
+});
+
+test('the hero and llms.txt show the same pitch', async ({ page, request }) => {
+  await page.goto('/');
+  const hero = page.getByRole('heading', { level: 1 }).locator('..');
+  await expect(hero).toContainText(INTRO);
+  const points = page.getByTestId('hero-points').getByRole('listitem');
+  await expect(points).toHaveCount(POINTS.length);
+  for (const [i, p] of POINTS.entries()) {
+    await expect(points.nth(i).locator('strong')).toHaveText(p.title);
+    await expect(points.nth(i).locator('span')).toHaveText(plain(p.detail));
+  }
+
+  const text = await (await request.get('/llms.txt')).text();
+  expect(text).toContain(`> ${INTRO}`);
+  for (const p of POINTS) expect(text).toContain(`- ${p.title}: ${p.detail}`);
 });
 
 for (const path of ['/', '/roadmap/', '/docs/memory/ownership/']) {
