@@ -2,6 +2,7 @@
 import Site from '../layouts/Site.astro';
 import RoadmapTeaser from '../components/landing/RoadmapTeaser.astro';
 import Signup from '../components/landing/Signup.astro';
+import { INTRO, POINTS, detailParts } from '../data/pitch';
 ---
 
 <Site
@@ -14,11 +15,11 @@ import Signup from '../components/landing/Signup.astro';
 <p style="margin: 0 0 28px; display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 999px; border: 1px solid #4A2A3C; background: #1F1219; font-size: 14px; color: #E6D8DF">
 <span style="width: 8px; height: 8px; border-radius: 50%; background: #F39C3D"></span>In design and early development. Nothing to install yet.</p>
 <h1 style="margin: 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(40px, 5.4vw, 68px); line-height: 1.04; letter-spacing: -0.02em">Clear syntax.<br><span style="color: #F39C3D">Maximum speed.</span></h1>
-<p style="margin: 28px 0 0; max-width: 30em; font-size: 20px; line-height: 1.5; color: #D9CCD3">A general-purpose language that compiles to one native executable.</p>
-<ul class="hero-points">
-<li style="--dot: #C0392B"><strong>Dependency injection, built in</strong><span><code>services</code> blocks, checked when you build</span></li>
-<li style="--dot: #F39C3D"><strong>Behavior contracts</strong><span><code>contract</code> blocks state each member's rules</span></li>
-<li style="--dot: #FFD27A"><strong>Shared libraries</strong><span>one <code>.wasm</code> file, imported by any build</span></li>
+<p style="margin: 28px 0 0; max-width: 30em; font-size: 20px; line-height: 1.5; color: #D9CCD3">{INTRO}</p>
+<ul class="hero-points" data-testid="hero-points">
+{POINTS.map((p) => (
+<li style={`--dot: ${p.dot}`}><strong>{p.title}</strong><span>{detailParts(p.detail).map((part, i) => (i % 2 ? <code>{part}</code> : part))}</span></li>
+))}
 </ul>
 <div style="margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px">
 <a href="#features" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 12px; background: #F39C3D; color: #1A0E12; font-weight: 600; text-decoration: none">See what's inside
