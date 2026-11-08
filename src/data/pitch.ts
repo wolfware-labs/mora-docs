@@ -6,6 +6,7 @@ export const INTRO = 'Mora is a general-purpose language that compiles to one na
 
 export const POINTS: Point[] = [
   { title: 'Dependency injection, built in', detail: '`services` blocks, checked when you build', dot: '#C0392B' },
+  { title: 'Macros in plain Mora', detail: 'a `macro` is a function that writes code at compile time', dot: '#D9622F' },
   { title: 'Behavior contracts', detail: "`contract` blocks state each member's rules", dot: '#F39C3D' },
   { title: 'Shared libraries', detail: 'one `.wasm` file, imported by any build', dot: '#FFD27A' },
 ];
