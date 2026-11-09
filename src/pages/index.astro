@@ -51,27 +51,20 @@ app.MapGet(<span class="s">"/users/&#123;id&#125;"</span>, <span class="k">async
 <span class="k">await</span> app.RunAsync(<span class="s">"127.0.0.1:8080"</span>)<span class="at">?</span>;</pre>
 </div>
 <div role="tabpanel" id="hero-services" aria-labelledby="hero-tab-services" class="hero-panel" hidden>
-<pre><span class="k">services</span> <span class="t">Storage</span> &#123;
+<pre><span class="c">// In a library</span>
+<span class="k">public services</span> <span class="t">SqlStore</span>&lt;<span class="t">TDb</span>&gt;
+    <span class="k">where</span> <span class="t">TDb</span> : <span class="k">class</span>, <span class="t">IDatabase</span> &#123;
+    <span class="k">singleton</span> <span class="t">DbOptions</span>&lt;<span class="t">TDb</span>&gt;;
+    <span class="k">singleton</span> <span class="t">IConnectionPool</span> = <span class="t">PgPool</span>;
+    <span class="k">scoped</span> <span class="t">TDb</span>;
+&#125;
+
+<span class="c">// In the app</span>
+<span class="k">services</span> <span class="t">App</span> : <span class="t">SqlStore</span>&lt;<span class="t">UsersDb</span>&gt; &#123;
+    <span class="k">override singleton</span> <span class="t">DbOptions</span>&lt;<span class="t">UsersDb</span>&gt; =
+        (cfg: <span class="t">AppConfig</span>) =&gt;
+            <span class="t">DbOptions</span>&lt;<span class="t">UsersDb</span>&gt;.Postgres(cfg.Database);
     <span class="k">scoped</span> <span class="t">IUserStore</span> = <span class="t">SqlUserStore</span>;
-    <span class="k">decorate</span> <span class="t">IUserStore</span> <span class="k">with</span> <span class="t">CachingUserStore</span>;
-&#125;
-
-<span class="k">services</span> <span class="t">AppBase</span> : <span class="t">Storage</span> &#123;
-    <span class="k">scoped</span> <span class="t">IAuditLog</span> = <span class="t">FileAuditLog</span>;
-    <span class="k">transient</span> <span class="t">WelcomeMail</span>;                      <span class="c">// a class bound to itself</span><span class="k">
-    singleton</span> <span class="t">IMailer</span>;                          <span class="c">// a requirement: every final block binds it</span><span class="k">
-    singleton</span> <span class="t">IHealthCheck</span> += <span class="t">DbCheck</span>;
-    <span class="k">singleton</span> <span class="t">IHealthCheck</span> += <span class="t">DiskCheck</span>;
-&#125;
-
-<span class="at">@Cfg</span>(Debug = <span class="k">true</span>)
-<span class="k">services</span> <span class="t">App</span> : <span class="t">AppBase</span> &#123;
-    <span class="k">override singleton</span> <span class="t">IMailer</span> = <span class="t">ConsoleMailer</span>;
-&#125;
-
-<span class="at">@Cfg</span>(Debug = <span class="k">false</span>)
-<span class="k">services</span> <span class="t">App</span> : <span class="t">AppBase</span> &#123;
-    <span class="k">override singleton</span> <span class="t">IMailer</span> = <span class="t">SmtpMailer</span>;
 &#125;</pre>
 </div>
 <div role="tabpanel" id="hero-model" aria-labelledby="hero-tab-model" class="hero-panel" hidden>
@@ -365,6 +358,7 @@ public class</span> <span class="t">Point</span> &#123;
 <li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Constructors are the wiring.</strong> A class lists its dependencies in its one constructor. A handler takes the services it needs as parameters.</span></li>
 <li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Mistakes are build errors.</strong> A missing binding, a cycle or a singleton that holds a scoped service fails <code>mora check</code> and shows in the editor, with the chain that leads to it.</span></li>
 <li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Tests swap services.</strong> A test composition inherits the app's and overrides what it fakes, and <code>uses none</code> proves the test never reaches the network or the disk.</span></li>
+<li style="display: flex; gap: 12px"><span style="flex: none; width: 6px; height: 6px; margin-top: 11px; border-radius: 50%; background: #F39C3D"></span><span><strong style="color: #F6EFE9">Blocks can be generic.</strong> A library publishes one block, such as <code>SqlStore&lt;TDb&gt;</code>, and each app inherits it with its own type: <code>services App : SqlStore&lt;UsersDb&gt;</code>. The compiler checks each instantiation in the app's graph, like any other block.</span></li>
 </ul>
 <ul style="margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px">
 <li style="padding: 4px 10px; border-radius: 8px; border: 1px solid #3A2833; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #D9CCD3">singleton</li>
