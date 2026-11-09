@@ -25,7 +25,7 @@ test('the hero tabs switch between the example files', async ({ page }) => {
   const panel = page.getByRole('tabpanel');
   const height = async () => (await page.locator('.hero-panels').boundingBox())!.height;
   const program = 'WebApp.Create<App>(args)';
-  const services = 'decorate IUserStore with CachingUserStore;';
+  const services = 'services App : SqlStore<UsersDb> {';
   const model = 'struct User(Id: int, Name: string, Email: string?);';
   const start = await height();
 
