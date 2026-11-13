@@ -30,7 +30,7 @@ The signup form appears only when `PUBLIC_MAILERLITE_ACTION` is set to a MailerL
 
 ## Deploy
 
-Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into an nginx image, smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. A nightly run rebuilds the image so the roadmap stays current.
+Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into an nginx image, smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. mora-lang sends a `roadmap-changed` dispatch when a milestone changes, or an issue that is in a milestone or labelled `explore` changes, which rebuilds the image so the roadmap follows GitHub within minutes; a nightly run rebuilds it too, in case a dispatch is missed.
 
 ## License
 

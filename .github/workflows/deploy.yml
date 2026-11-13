@@ -1,10 +1,16 @@
 name: Deploy
 
-# One file for all three triggers so run_number is a single increasing
+# One file for every trigger so run_number is a single increasing
 # sequence, which is what the cluster follows.
 on:
   push:
     branches: [main]
+  # mora-lang sends roadmap-changed when a milestone changes, or an issue
+  # that is in a milestone or labelled explore changes, so the roadmap page
+  # follows GitHub within minutes. The nightly run stays as a fallback for a
+  # missed dispatch.
+  repository_dispatch:
+    types: [roadmap-changed]
   schedule:
     - cron: "23 6 * * *"
   workflow_dispatch:
