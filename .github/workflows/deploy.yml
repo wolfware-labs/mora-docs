@@ -5,9 +5,10 @@ name: Deploy
 on:
   push:
     branches: [main]
-  # mora-lang sends roadmap-changed when an issue or milestone changes, so
-  # the roadmap page follows GitHub within minutes. The nightly run stays as
-  # a fallback for a missed dispatch.
+  # mora-lang sends roadmap-changed when a milestone changes, or an issue
+  # that is in a milestone or labelled explore changes, so the roadmap page
+  # follows GitHub within minutes. The nightly run stays as a fallback for a
+  # missed dispatch.
   repository_dispatch:
     types: [roadmap-changed]
   schedule:
