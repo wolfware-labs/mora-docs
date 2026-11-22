@@ -16,6 +16,7 @@ const fonts = [
   { name: 'Unbounded', data: font('unbounded', 'unbounded-latin-600-normal.woff'), weight: 600 },
   { name: 'Figtree', data: font('figtree', 'figtree-latin-400-normal.woff'), weight: 400 },
   { name: 'JetBrains Mono', data: font('jetbrains-mono', 'jetbrains-mono-latin-500-normal.woff'), weight: 500 },
+  { name: 'JetBrains Mono', data: font('jetbrains-mono', 'jetbrains-mono-latin-700-normal.woff'), weight: 700 },
 ] as const;
 
 // The logo file as it ships, 1280x521.
@@ -49,6 +50,9 @@ export type Card = { title: string; accent?: string; eyebrow?: string; descripti
 
 // Unbounded is wide: the size steps down with the title's length so two lines always hold it.
 const titleSize = (length: number) => (length > 40 ? 50 : length > 28 ? 58 : length > 18 ? 66 : 76);
+
+// Error codes (MR0147) are set in the mono font, where 0 cannot be read as O.
+const isCode = (title: string) => /^MR\d+$/.test(title);
 
 export async function renderCard({ title, accent, eyebrow, description }: Card): Promise<Buffer> {
   const size = titleSize(title.length + (accent ? accent.length + 1 : 0));
@@ -86,7 +90,9 @@ export async function renderCard({ title, accent, eyebrow, description }: Card):
               : null,
             h(
               'div',
-              { display: 'block', fontFamily: 'Unbounded', fontWeight: 500, fontSize: size, lineHeight: 1.08, letterSpacing: '-0.02em', lineClamp: 2 },
+              isCode(title)
+                ? { display: 'block', fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: size, lineHeight: 1.08 }
+                : { display: 'block', fontFamily: 'Unbounded', fontWeight: 500, fontSize: size, lineHeight: 1.08, letterSpacing: '-0.02em', lineClamp: 2 },
               heading,
             ),
             description
