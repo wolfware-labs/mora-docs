@@ -172,3 +172,46 @@ test('the docs header has one bottom border, across the full width', async ({ pa
     { outer: false, width: '0px' },
   ]);
 });
+
+// Each page links its own share card; the card must exist at 1200x630.
+for (const [path, card] of [
+  ['/', '/og/index.png'],
+  ['/docs/install/', '/og/docs/install.png'],
+  ['/docs/errors/mr0147/', '/og/docs/errors/mr0147.png'],
+]) {
+  test(`${path} links a 1200x630 share card`, async ({ page, request }) => {
+    await page.goto(path);
+    const meta = (attr: string, name: string) => page.locator(`meta[${attr}="${name}"]`).getAttribute('content');
+    const image = `https://moralang.org${card}`;
+    expect(await meta('property', 'og:image')).toBe(image);
+    expect(await meta('name', 'twitter:image')).toBe(image);
+    expect(await meta('property', 'og:image:width')).toBe('1200');
+    expect(await meta('property', 'og:image:height')).toBe('630');
+    expect(await meta('property', 'og:image:alt')).toMatch(/^Mora share card: /);
+    expect(await meta('name', 'twitter:card')).toBe('summary_large_image');
+
+    const res = await request.get(card);
+    expect(res.ok()).toBe(true);
+    const png = await res.body();
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+  });
+}
+
+test('the landing page describes Mora in JSON-LD', async ({ page }) => {
+  await page.goto('/');
+  const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+  expect(scripts).toHaveLength(1);
+  const data = JSON.parse(scripts[0]);
+  expect(data).toMatchObject({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Mora',
+    url: 'https://moralang.org/',
+    codeRepository: 'https://github.com/wolfware-labs/mora-lang',
+    author: { '@type': 'Organization', name: 'Wolfware', legalName: 'Wolfware LLC' },
+  });
+  expect(data.description).toBe(await page.locator('meta[name="description"]').getAttribute('content'));
+
+  await page.goto('/roadmap/');
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
+});
