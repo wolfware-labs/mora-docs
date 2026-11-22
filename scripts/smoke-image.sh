@@ -57,6 +57,22 @@ get /docs/
 [ "$status" = 200 ] || fail "/docs/ returns 200 (got $status)"
 ok "/docs/ returns 200"
 
+# Share cards are rendered at build time; each page's og:image must point at one that exists.
+grep -q 'property="og:image" content="https://moralang.org/og/index.png"' "$tmp/index.html" ||
+  fail "/ links the landing share card"
+get /og/index.png
+[ "$status" = 200 ] || fail "/og/index.png returns 200 (got $status)"
+[ "$(header Content-Type)" = "image/png" ] || fail "/og/index.png is a PNG (got $(header Content-Type))"
+ok "/ has a share card"
+
+get /docs/install/
+grep -q 'property="og:image" content="https://moralang.org/og/docs/install.png"' "$tmp/b" ||
+  fail "/docs/install/ links its own share card"
+get /og/docs/install.png
+[ "$status" = 200 ] || fail "/og/docs/install.png returns 200 (got $status)"
+[ "$(header Content-Type)" = "image/png" ] || fail "/og/docs/install.png is a PNG (got $(header Content-Type))"
+ok "/docs/install/ has a share card"
+
 get /docs
 [ "$status" = 301 ] || fail "/docs returns 301 (got $status)"
 [ "$(header Location)" = "/docs/" ] || fail "/docs Location is /docs/ (got $(header Location))"
@@ -66,6 +82,8 @@ get /no-such-page/
 [ "$status" = 404 ] || fail "/no-such-page/ returns 404 (got $status)"
 grep -qF "$marker" "$tmp/b" || fail "404 body contains '$marker'"
 ok "/no-such-page/ returns the 404 page"
+if grep -q 'property="og:image"' "$tmp/b"; then fail "/no-such-page/ links no share card"; fi
+ok "/no-such-page/ links no share card"
 
 css="$(grep -o '/_astro/[^"]*\.css' "$tmp/index.html" | head -1)"
 [ -n "$css" ] || fail "/ references a /_astro css file"

@@ -3,15 +3,36 @@ import '../styles/site.css';
 import Header from '../components/landing/Header.astro';
 import Footer from '../components/landing/Footer.astro';
 import BackToTop from '../components/BackToTop.astro';
+import { REPOSITORY, SITE_NAME, ogImage, ogImageAlt } from '../lib/share';
+import { PAGE_CARDS, cardHeading } from '../data/pages';
 
 interface Props {
   title: string;
   description: string;
   current?: 'roadmap';
+  /** The landing page describes the language for search engines (JSON-LD). */
+  structured?: boolean;
 }
 
-const { title, description, current } = Astro.props;
+const { title, description, current, structured } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+// Each page links its own card (src/pages/og/[...slug].png.ts).
+const card = current ?? 'index';
+const image = new URL(ogImage(card), Astro.site).href;
+const imageAlt = ogImageAlt(cardHeading(PAGE_CARDS[card]));
+const jsonLd = structured && {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: SITE_NAME,
+  description,
+  url: canonical,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Windows, Linux, macOS',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  codeRepository: REPOSITORY,
+  license: [`${REPOSITORY}/blob/main/LICENSE-MIT`, `${REPOSITORY}/blob/main/LICENSE-APACHE`],
+  author: { '@type': 'Organization', name: 'Wolfware', legalName: 'Wolfware LLC', url: 'https://wolfware.dev' },
+};
 ---
 
 <!doctype html>
@@ -27,10 +48,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <title>{title}</title>
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Mora" />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
     <div
