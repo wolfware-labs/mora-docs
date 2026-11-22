@@ -82,6 +82,8 @@ get /no-such-page/
 [ "$status" = 404 ] || fail "/no-such-page/ returns 404 (got $status)"
 grep -qF "$marker" "$tmp/b" || fail "404 body contains '$marker'"
 ok "/no-such-page/ returns the 404 page"
+if grep -q 'property="og:image"' "$tmp/b"; then fail "/no-such-page/ links no share card"; fi
+ok "/no-such-page/ links no share card"
 
 css="$(grep -o '/_astro/[^"]*\.css' "$tmp/index.html" | head -1)"
 [ -n "$css" ] || fail "/ references a /_astro css file"

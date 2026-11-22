@@ -215,3 +215,9 @@ test('the landing page describes Mora in JSON-LD', async ({ page }) => {
   await page.goto('/roadmap/');
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
 });
+
+test('the 404 page links no share card', async ({ page }) => {
+  await page.goto('/no-such-page/');
+  await expect(page.locator('meta[property="og:image"]')).toHaveCount(0);
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveCount(0);
+});
