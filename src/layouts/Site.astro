@@ -4,6 +4,7 @@ import Header from '../components/landing/Header.astro';
 import Footer from '../components/landing/Footer.astro';
 import BackToTop from '../components/BackToTop.astro';
 import { REPOSITORY, SITE_NAME, ogImage, ogImageAlt } from '../lib/share';
+import { PAGE_CARDS, cardHeading } from '../data/pages';
 
 interface Props {
   title: string;
@@ -15,9 +16,10 @@ interface Props {
 
 const { title, description, current, structured } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-// The landing and the roadmap share the landing's card.
-const image = new URL(ogImage(), Astro.site).href;
-const imageAlt = ogImageAlt('Clear syntax. Maximum speed.');
+// Each page links its own card (src/pages/og/[...slug].png.ts).
+const card = current ?? 'index';
+const image = new URL(ogImage(card), Astro.site).href;
+const imageAlt = ogImageAlt(cardHeading(PAGE_CARDS[card]));
 const jsonLd = structured && {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',

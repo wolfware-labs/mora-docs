@@ -1,7 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { renderCard, type Card } from '../../lib/og';
-import { INTRO, plain } from '../../data/pitch';
+import { plain } from '../../data/pitch';
+import { PAGE_CARDS } from '../../data/pages';
 import { sectionLabels } from '../../data/sidebar.mjs';
 
 // Section labels come from the sidebar, so a card shows what the navigation shows.
@@ -15,10 +16,8 @@ const eyebrow = (id: string) => {
 
 export const getStaticPaths = (async () => {
   const docs = await getCollection('docs');
-  // The landing hero's heading and intro.
-  const landing: Card = { title: 'Clear syntax.', accent: 'Maximum speed.', description: INTRO };
   return [
-    { params: { slug: 'index' }, props: landing },
+    ...Object.entries(PAGE_CARDS).map(([slug, card]) => ({ params: { slug }, props: card as Card })),
     ...docs.map((entry) => ({
       params: { slug: entry.id },
       props: {

@@ -176,6 +176,7 @@ test('the docs header has one bottom border, across the full width', async ({ pa
 // Each page links its own share card; the card must exist at 1200x630.
 for (const [path, card] of [
   ['/', '/og/index.png'],
+  ['/roadmap/', '/og/roadmap.png'],
   ['/docs/install/', '/og/docs/install.png'],
   ['/docs/errors/mr0147/', '/og/docs/errors/mr0147.png'],
 ]) {

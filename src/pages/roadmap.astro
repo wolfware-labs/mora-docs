@@ -1,5 +1,6 @@
 ---
 import Site from '../layouts/Site.astro';
+import { ROADMAP_DESCRIPTION } from '../data/pages';
 import { MILESTONE_NOTES, RELEASES } from '../data/releases';
 import { milestoneStatus, progress, roadmap, type Milestone } from '../lib/roadmap';
 
@@ -30,7 +31,7 @@ const grid = 'margin: 28px 0 0; padding: 0; list-style: none; display: grid; gri
 
 <Site
   title="Roadmap · Mora"
-  description="Where Mora is headed: the milestones of each release line, with live progress from GitHub."
+  description={ROADMAP_DESCRIPTION}
   current="roadmap"
 >
   <main style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 96px">
