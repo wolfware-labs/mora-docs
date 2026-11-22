@@ -3,6 +3,7 @@ import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import { readFileSync } from 'node:fs';
+import { SIDEBAR } from './src/data/sidebar.mjs';
 
 const json = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
 const moraGrammar = json('./src/lib/mora.tmLanguage.json');
@@ -38,32 +39,7 @@ export default defineConfig({
       customCss: ['./src/styles/docs.css'],
       editLink: { baseUrl: 'https://github.com/wolfware-labs/mora-docs/edit/main/' },
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/wolfware-labs/mora-lang' }],
-      sidebar: [
-        { label: 'Introduction', link: '/docs/' },
-        { slug: 'docs/install' },
-        { slug: 'docs/first-program' },
-        { label: 'Tour', collapsed: true, items: [{ autogenerate: { directory: 'docs/tour' } }] },
-        { label: 'Language', collapsed: true, items: [{ autogenerate: { directory: 'docs/language' } }] },
-        { label: 'Memory and errors', items: [{ autogenerate: { directory: 'docs/memory' } }] },
-        { label: 'Concurrency', collapsed: true, items: [{ autogenerate: { directory: 'docs/concurrency' } }] },
-        { label: 'Macro guide', collapsed: true, items: [{ autogenerate: { directory: 'docs/macros' } }] },
-        { label: 'Toolchain', collapsed: true, items: [{ autogenerate: { directory: 'docs/toolchain' } }] },
-        {
-          label: 'Reference',
-          collapsed: true,
-          items: [
-            'docs/reference/standard-library',
-            'docs/reference/http-and-json',
-            { label: 'Error codes', link: '/docs/errors/' },
-            'docs/reference/grammar',
-            'docs/reference/specification',
-          ],
-        },
-        {
-          label: 'For tools and agents',
-          items: [{ label: 'llms.txt', link: '/llms.txt', attrs: { target: '_blank' } }],
-        },
-      ],
+      sidebar: SIDEBAR,
     }),
   ],
 });

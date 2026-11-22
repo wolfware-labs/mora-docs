@@ -2,18 +2,10 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { renderCard, type Card } from '../../lib/og';
 import { INTRO, plain } from '../../data/pitch';
+import { sectionLabels } from '../../data/sidebar.mjs';
 
-// The sidebar's label for each docs folder (astro.config.mjs).
-const SECTIONS: Record<string, string> = {
-  tour: 'Tour',
-  language: 'Language',
-  memory: 'Memory and errors',
-  concurrency: 'Concurrency',
-  macros: 'Macro guide',
-  toolchain: 'Toolchain',
-  reference: 'Reference',
-  errors: 'Error codes',
-};
+// Section labels come from the sidebar, so a card shows what the navigation shows.
+const SECTIONS = sectionLabels();
 
 // docs/tour/unions -> "Docs · Tour"; a page at the top of the docs is just "Docs".
 const eyebrow = (id: string) => {
