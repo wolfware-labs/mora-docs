@@ -17,6 +17,15 @@ export function appJwt(appId: string, privateKey: string, nowMs: number): string
   return `${unsigned}.${signature}`;
 }
 
+/** A GitHub answer outside 2xx, with its status. */
+class GitHubError extends Error {
+  readonly status: number;
+  constructor(status: number, path: string) {
+    super(`GitHub answered ${status} for ${path}`);
+    this.status = status;
+  }
+}
+
 type AppOptions = {
   appId: string;
   privateKey: string;
@@ -55,7 +64,7 @@ export function createAppTokenSource({
       body: body ? JSON.stringify(body) : undefined,
       signal: AbortSignal.timeout(10_000),
     });
-    if (!res.ok) throw new Error(`GitHub answered ${res.status} for ${path}`);
+    if (!res.ok) throw new GitHubError(res.status, path);
     return (await res.json()) as Record<string, unknown>;
   }
 
@@ -68,6 +77,10 @@ export function createAppTokenSource({
     const answer = await call('POST', `/app/installations/${installationId}/access_tokens`, {
       repositories: [repo],
       permissions: { issues: 'read', metadata: 'read' },
+    }).catch((err: unknown) => {
+      // A reinstalled App has a new installation id, so the next mint looks it up again.
+      if (err instanceof GitHubError && err.status === 404) installationId = undefined;
+      throw err;
     });
     const expiresAt = Date.parse(String(answer.expires_at));
     if (typeof answer.token !== 'string' || Number.isNaN(expiresAt)) throw new Error('unexpected token shape');

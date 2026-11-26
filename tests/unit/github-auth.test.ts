@@ -92,6 +92,31 @@ describe('createAppTokenSource', () => {
     expect(calls.filter((c) => c.method === 'POST')).toHaveLength(1);
   });
 
+  it('looks the installation up again after GitHub answers 404 for its tokens', async () => {
+    const calls: Call[] = [];
+    let installation = 42;
+    let t = Date.parse('2026-11-26T12:00:00Z');
+    // A reinstalled App gets a new installation id; tokens for the old one answer 404.
+    const fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ method: init?.method ?? 'GET', url, auth: null, body: undefined });
+      if (url.endsWith('/installation')) return new Response(JSON.stringify({ id: installation }), { status: 200 });
+      if (url.endsWith(`/app/installations/${installation}/access_tokens`)) {
+        const answer = { token: `ghs_${installation}`, expires_at: '2026-11-26T12:30:00Z' };
+        return new Response(JSON.stringify(answer), { status: 201 });
+      }
+      return new Response('{}', { status: 404 });
+    }) as typeof globalThis.fetch;
+    const token = createAppTokenSource(options(fetch, () => t));
+
+    expect(await token()).toBe('ghs_42');
+    installation = 77;
+    t += 30 * 60 * 1000;
+    await expect(token()).rejects.toThrow('GitHub answered 404');
+    expect(await token()).toBe('ghs_77');
+    expect(calls.filter((c) => c.url.endsWith('/installation'))).toHaveLength(2);
+  });
+
   it('rejects when GitHub refuses the token, and tries again on the next call', async () => {
     let status = 403;
     const t = Date.parse('2026-11-26T12:00:00Z');
