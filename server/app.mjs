@@ -3,12 +3,80 @@
 // scripts/smoke-image.sh checks the same behaviour on the built image.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, normalize, relative, sep } from 'node:path';
+import { createBrotliCompress, createGzip } from 'node:zlib';
 import sirv from 'sirv';
 
 const IMMUTABLE = 'public, max-age=31536000, immutable';
 
 /** The pages with `export const prerender = false`, which Astro renders on each request. */
 export const ON_DEMAND_PATHS = ['/', '/roadmap/'];
+
+/**
+ * The encoding for a rendered page: br, then gzip, when the Accept-Encoding header allows it,
+ * else undefined.
+ * @param {string | undefined} header
+ */
+function pickEncoding(header = '') {
+  const weights = new Map();
+  for (const part of header.toLowerCase().split(',')) {
+    const [name, ...params] = part.split(';').map((s) => s.trim());
+    const q = params.find((param) => param.startsWith('q='));
+    weights.set(name, q === undefined ? 1 : Number(q.slice(2)));
+  }
+  return ['br', 'gzip'].find((name) => (weights.get(name) ?? weights.get('*') ?? 0) > 0);
+}
+
+/**
+ * Compresses what `res` is about to send, as it is written, with the encoding the request
+ * accepts. Astro writes a rendered page with writeHead, write and end, so those three go
+ * through the compressor; a response with no body (1xx, 204, 304) is sent as it is.
+ * @param {import('node:http').IncomingMessage} req
+ * @param {import('node:http').ServerResponse} res
+ */
+function compress(req, res) {
+  const encoding = pickEncoding(req.headers['accept-encoding']);
+  const { writeHead, write, end } = res;
+  /** @type {import('node:zlib').Gzip | import('node:zlib').BrotliCompress | null | undefined} */
+  let zip;
+
+  function start(status) {
+    if (zip !== undefined) return;
+    zip = null;
+    const vary = res.getHeader('Vary');
+    res.setHeader('Vary', vary ? `${vary}, Accept-Encoding` : 'Accept-Encoding');
+    const empty = status < 200 || status === 204 || status === 304;
+    if (encoding === undefined || empty || res.hasHeader('Content-Encoding')) return;
+    res.setHeader('Content-Encoding', encoding);
+    res.removeHeader('Content-Length');
+    zip = encoding === 'br' ? createBrotliCompress() : createGzip();
+    zip.on('data', (chunk) => write.call(res, chunk));
+    zip.on('end', () => end.call(res));
+    zip.on('error', (err) => res.destroy(err));
+    res.once('close', () => zip?.destroy());
+  }
+
+  res.writeHead = function (status, ...rest) {
+    // Headers given here would replace the ones start() sets, so they are set first.
+    const headers = rest.find((arg) => typeof arg === 'object' && arg !== null);
+    const pairs = Array.isArray(headers)
+      ? headers.flatMap((value, i) => (i % 2 === 0 ? [[value, headers[i + 1]]] : []))
+      : Object.entries(headers ?? {});
+    for (const [name, value] of pairs) if (value !== undefined) res.setHeader(name, value);
+    start(status);
+    return writeHead.call(res, status, ...rest.filter((arg) => typeof arg === 'string'));
+  };
+  res.write = function (chunk, ...rest) {
+    start(res.statusCode);
+    return zip ? zip.write(chunk, ...rest) : write.call(res, chunk, ...rest);
+  };
+  res.end = function (...args) {
+    start(res.statusCode);
+    if (!zip) return end.apply(res, args);
+    if (typeof args.at(-1) === 'function') res.once('finish', args.pop());
+    zip.end(...args);
+    return res;
+  };
+}
 
 /**
  * @param {{
@@ -121,6 +189,7 @@ export function createApp({ clientDir, ssr, ssrPaths }) {
     // /_server-islands) are never served. A throw here must not end the process.
     const render = () => {
       if (!onDemand.has(path)) return notFound(res);
+      compress(req, res);
       return Promise.resolve(ssr(req, res, () => notFound(res))).catch((err) => fail(res, err));
     };
     try {
