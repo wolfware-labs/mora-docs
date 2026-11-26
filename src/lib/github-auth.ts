@@ -1,4 +1,5 @@
 import { createSign } from 'node:crypto';
+import { appSettings } from '../../server/github-app-config.mjs';
 
 const API = 'https://api.github.com';
 /** A token is renewed this long before GitHub says it expires. */
@@ -17,8 +18,8 @@ export function appJwt(appId: string, privateKey: string, nowMs: number): string
   return `${unsigned}.${signature}`;
 }
 
-/** A GitHub answer outside 2xx, with its status. */
-class GitHubError extends Error {
+/** A GitHub answer whose status the caller does not accept, with that status. */
+export class GitHubError extends Error {
   readonly status: number;
   constructor(status: number, path: string) {
     super(`GitHub answered ${status} for ${path}`);
@@ -106,13 +107,8 @@ export function authFromEnv(
   env: Record<string, string | undefined> = process.env,
   fetch: typeof globalThis.fetch = globalThis.fetch,
 ): TokenSource {
-  const { GITHUB_APP_ID: appId, GITHUB_TOKEN: token } = env;
-  // A secret store with one-line fields keeps the PEM with a literal \n for each line break.
-  const privateKey = env.GITHUB_APP_PRIVATE_KEY?.replaceAll('\\n', '\n');
-  if (appId && privateKey) {
-    return createAppTokenSource({ appId, privateKey, ...repository, fetch });
-  }
-  if (appId) throw new Error('GITHUB_APP_ID is set without GITHUB_APP_PRIVATE_KEY');
-  if (privateKey) throw new Error('GITHUB_APP_PRIVATE_KEY is set without GITHUB_APP_ID');
+  const app = appSettings(env);
+  if (app) return createAppTokenSource({ ...app, ...repository, fetch });
+  const token = env.GITHUB_TOKEN;
   return () => Promise.resolve(token || undefined);
 }

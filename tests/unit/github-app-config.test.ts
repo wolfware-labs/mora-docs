@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { generateKeyPairSync } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { appConfigProblem } from '../../server/github-app-config.mjs';
+import { appConfigProblem, appSettings } from '../../server/github-app-config.mjs';
 
 const pem = (type: 'rsa' | 'ec') =>
   (type === 'rsa'
@@ -12,6 +12,27 @@ const pem = (type: 'rsa' | 'ec') =>
     .export({ type: 'pkcs8', format: 'pem' })
     .toString();
 const rsa = pem('rsa');
+
+describe('appSettings', () => {
+  it('reads the App id and key, turning a literal \\n into a line break', () => {
+    const oneLine = rsa.trim().replaceAll('\n', '\\n');
+    expect(appSettings({ GITHUB_APP_ID: '123', GITHUB_APP_PRIVATE_KEY: oneLine })).toEqual({
+      appId: '123',
+      privateKey: rsa.trim(),
+    });
+  });
+
+  it('answers undefined when neither is set', () => {
+    expect(appSettings({ GITHUB_TOKEN: 'local' })).toBeUndefined();
+  });
+
+  it('throws on half an App configuration', () => {
+    expect(() => appSettings({ GITHUB_APP_ID: '123' })).toThrow('GITHUB_APP_ID is set without GITHUB_APP_PRIVATE_KEY');
+    expect(() => appSettings({ GITHUB_APP_PRIVATE_KEY: rsa })).toThrow(
+      'GITHUB_APP_PRIVATE_KEY is set without GITHUB_APP_ID',
+    );
+  });
+});
 
 describe('appConfigProblem', () => {
   it('accepts no App at all, and a full App with an RSA key', () => {

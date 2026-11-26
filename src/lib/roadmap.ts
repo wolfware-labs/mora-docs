@@ -1,5 +1,5 @@
 import snapshot from '../data/roadmap.snapshot.json' with { type: 'json' };
-import { authFromEnv, type TokenSource } from './github-auth';
+import { GitHubError, authFromEnv, type TokenSource } from './github-auth';
 
 const OWNER = 'wolfware-labs';
 const REPO = 'mora-lang';
@@ -131,7 +131,7 @@ export async function fetchRoadmap({
 
   async function get(path: string): Promise<unknown[]> {
     const res = await fetch(`${API}/${path}`, { headers, signal: AbortSignal.timeout(10_000) });
-    if (res.status !== 200) throw new Error(`GitHub answered ${res.status} for ${path}`);
+    if (res.status !== 200) throw new GitHubError(res.status, path);
     const body: unknown = await res.json();
     if (!Array.isArray(body)) throw new Error(`unexpected response shape for ${path}`);
     return body;
