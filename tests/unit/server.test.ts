@@ -79,6 +79,14 @@ describe('createApp', () => {
     expect(res.headers.get('location')).toBe('/docs/');
   });
 
+  it('never redirects to another host', async () => {
+    for (const path of ['//docs', '/\\docs', '/%2Fdocs']) {
+      const res = await get(path);
+      const location = res.headers.get('location');
+      if (location !== null) expect(location).toBe('/docs/');
+    }
+  });
+
   it('hands pages it has no file for to the renderer, with the same headers', async () => {
     const res = await get('/roadmap/');
     expect(res.status).toBe(200);

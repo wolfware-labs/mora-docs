@@ -30,16 +30,22 @@ export function createApp({ clientDir, ssr }) {
   });
   const notFoundPage = readFileSync(join(clientDir, '404.html'));
 
-  /** True when `path` names a folder of the client dir that holds an index.html. */
-  function isFolder(path) {
+  /**
+   * The canonical URL of the folder `path` names, when it is a folder of the client dir that
+   * holds an index.html; undefined otherwise. Built from the normalized path, never the raw
+   * one, so "//docs" cannot become a redirect to another host.
+   */
+  function folderUrl(path) {
     let decoded;
     try {
       decoded = decodeURIComponent(path);
     } catch {
-      return false;
+      return undefined;
     }
     const full = normalize(join(root, decoded));
-    return full.startsWith(root) && existsSync(join(full, 'index.html'));
+    if (!full.startsWith(root) || !existsSync(join(full, 'index.html'))) return undefined;
+    const segments = full.slice(root.length).split(sep).filter(Boolean);
+    return `/${segments.map(encodeURIComponent).join('/')}/`;
   }
 
   function notFound(res) {
@@ -54,10 +60,11 @@ export function createApp({ clientDir, ssr }) {
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
     const path = (req.url ?? '/').split('?')[0];
-    if (!path.endsWith('/') && isFolder(path)) {
+    const folder = path.endsWith('/') ? undefined : folderUrl(path);
+    if (folder !== undefined && folder !== '/') {
       // Relative, since requests reach the pod through a tunnel on another host and port.
       res.statusCode = 301;
-      res.setHeader('Location', `${path}/`);
+      res.setHeader('Location', folder);
       res.end();
       return;
     }
