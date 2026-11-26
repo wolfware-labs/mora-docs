@@ -3,11 +3,11 @@ import { createServer, request, type IncomingHttpHeaders, type IncomingMessage, 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { brotliDecompressSync, gunzipSync, gzipSync } from 'node:zlib';
+import { brotliCompressSync, brotliDecompressSync, gunzipSync, gzipSync } from 'node:zlib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ON_DEMAND_PATHS, createApp } from '../../server/app.mjs';
 
-type Ssr = (req: IncomingMessage, res: ServerResponse, next: () => void) => void;
+type Ssr = (req: IncomingMessage, res: ServerResponse, next: () => void) => unknown;
 
 // The client folder sits inside `root`, so a test can put a file just outside it.
 let root: string;
@@ -15,12 +15,13 @@ let dir: string;
 let server: Server;
 let base: string;
 
-// Stands in for Astro's handler: renders /roadmap/, throws on /boom/, and passes every other
-// path on. `rendered` lists every path it was asked for.
+// Stands in for Astro's handler: renders /roadmap/, throws on /boom/, rejects on /rejects/,
+// and passes every other path on (/gone/ among the on-demand ones). `rendered` lists every path it was asked for.
 const rendered: string[] = [];
 const ssr: Ssr = (req, res, next) => {
   rendered.push(req.url ?? '');
   if (req.url === '/boom/') throw new Error('render failed');
+  if (req.url === '/rejects/') return Promise.reject(new Error('render failed later'));
   if (req.url === '/roadmap/') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end('<title>live roadmap</title>');
@@ -40,7 +41,9 @@ beforeAll(async () => {
   writeFileSync(join(dir, '404.html'), '<title>Not found</title>');
   writeFileSync(join(dir, 'llms.txt'), 'Mora');
   writeFileSync(join(dir, '_astro', 'site.abc123.css.gz'), gzipSync('body{}'));
-  server = createServer(createApp({ clientDir: dir, ssr, ssrPaths: ['/roadmap/', '/boom/'] }));
+  writeFileSync(join(dir, '_astro', 'site.abc123.css.br'), brotliCompressSync('body{}'));
+  const ssrPaths = ['/roadmap/', '/boom/', '/rejects/', '/gone/'];
+  server = createServer(createApp({ clientDir: dir, ssr, ssrPaths }));
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   if (address === null || typeof address === 'string') throw new Error('no port');
@@ -94,6 +97,13 @@ describe('createApp', () => {
     expect(res.headers.get('content-encoding')).toBe('gzip');
     expect(res.headers.get('content-type')).toMatch(/^text\/css/);
     expect(await res.text()).toBe('body{}');
+  });
+
+  it('serves the brotli copy of a file to a client that accepts it', async () => {
+    const res = await raw('/_astro/site.abc123.css', { 'Accept-Encoding': 'gzip, br' });
+    expect(res.headers['content-encoding']).toBe('br');
+    expect(res.headers['content-type']).toMatch(/^text\/css/);
+    expect(brotliDecompressSync(res.body).toString()).toBe('body{}');
   });
 
   it('redirects a folder without its slash, with a relative Location', async () => {
@@ -161,6 +171,21 @@ describe('createApp', () => {
     const res = await get('/boom/');
     expect(res.status).toBe(500);
     expect((await get('/docs/')).status).toBe(200);
+  });
+
+  it('answers 500 when rendering rejects, and keeps answering', async () => {
+    const res = await get('/rejects/');
+    expect(res.status).toBe(500);
+    expect(await res.text()).toBe('Internal Server Error');
+    expect((await get('/docs/')).status).toBe(200);
+  });
+
+  it('answers 404 with the 404 page when the renderer passes an on-demand path on', async () => {
+    rendered.length = 0;
+    const res = await get('/gone/');
+    expect(res.status).toBe(404);
+    expect(await res.text()).toBe('<title>Not found</title>');
+    expect(rendered).toEqual(['/gone/']);
   });
 
   it('passes only the on-demand pages to the renderer', async () => {
