@@ -5,6 +5,11 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # The docs pages are generated from the language spec, which
+  # scripts/sync-spec.mjs reads from mora-lang at build time, so a
+  # nightly rebuild picks up spec changes made since the last push.
+  schedule:
+    - cron: "23 6 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -64,7 +69,7 @@ jobs:
             docker push "$ref"
           done <<< "$refs"
         env:
-          # Manual runs rebuild the release commit, so only the push that made it moves site-<version>.
+          # Nightly and manual runs rebuild the release commit, so only the push that made it moves site-<version>.
           RELEASE_TAGS: ${{ github.event_name == 'push' && 'true' || '' }}
           IMAGE_REPO: docker.io/wolfware/mora-site
           RUN_NUMBER: ${{ github.run_number }}
