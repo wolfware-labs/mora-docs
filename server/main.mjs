@@ -8,7 +8,13 @@ const out = new URL(`../${process.env.MORA_OUT_DIR || 'dist'}/`, import.meta.url
 const { handler } = await import(pathToFileURL(fileURLToPath(new URL('server/entry.mjs', out))).href);
 const port = Number(process.env.PORT || 8080);
 
-const server = createServer(createApp({ clientDir: fileURLToPath(new URL('client/', out)), ssr: handler }));
+const app = createApp({
+  clientDir: fileURLToPath(new URL('client/', out)),
+  ssr: handler,
+  // The pages with `export const prerender = false`.
+  ssrPaths: ['/', '/roadmap/'],
+});
+const server = createServer(app);
 server.listen(port, () => console.log(`site: listening on ${port}`));
 
 // Kubernetes sends SIGTERM on a rollout: finish the requests in flight, then exit.

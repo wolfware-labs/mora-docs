@@ -12,8 +12,12 @@ let dir: string;
 let server: Server;
 let base: string;
 
-// Stands in for Astro's handler: renders /roadmap/ and passes every other path on.
+// Stands in for Astro's handler: renders /roadmap/, throws on /boom/, and passes every other
+// path on. `rendered` lists every path it was asked for.
+const rendered: string[] = [];
 const ssr: Ssr = (req, res, next) => {
+  rendered.push(req.url ?? '');
+  if (req.url === '/boom/') throw new Error('render failed');
   if (req.url === '/roadmap/') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end('<title>live roadmap</title>');
@@ -31,7 +35,7 @@ beforeAll(async () => {
   writeFileSync(join(dir, '404.html'), '<title>Not found</title>');
   writeFileSync(join(dir, 'llms.txt'), 'Mora');
   writeFileSync(join(dir, '_astro', 'site.abc123.css.gz'), gzipSync('body{}'));
-  server = createServer(createApp({ clientDir: dir, ssr }));
+  server = createServer(createApp({ clientDir: dir, ssr, ssrPaths: ['/roadmap/', '/boom/'] }));
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = server.address();
   if (address === null || typeof address === 'string') throw new Error('no port');
@@ -101,6 +105,33 @@ describe('createApp', () => {
     expect(await res.text()).toBe('<title>Not found</title>');
     expect(res.headers.get('content-type')).toMatch(/^text\/html/);
     expectSecurityHeaders(res);
+  });
+
+  it('survives an inverted Range header and keeps answering', async () => {
+    const res = await fetch(`${base}/docs/`, { headers: { Range: 'bytes=10-5' } });
+    expect([200, 416]).toContain(res.status);
+    await res.arrayBuffer();
+    expect((await get('/docs/')).status).toBe(200);
+  });
+
+  it('answers 500 when rendering throws, and keeps answering', async () => {
+    const res = await get('/boom/');
+    expect(res.status).toBe(500);
+    expect((await get('/docs/')).status).toBe(200);
+  });
+
+  it('passes only the on-demand pages to the renderer', async () => {
+    rendered.length = 0;
+    for (const path of ['/_image?href=/x.png&w=64', '/_server-islands/x', '/no-such-page/']) {
+      expect((await get(path)).status).toBe(404);
+    }
+    expect(rendered).toEqual([]);
+  });
+
+  it('redirects an on-demand page without its slash', async () => {
+    const res = await get('/roadmap');
+    expect(res.status).toBe(301);
+    expect(res.headers.get('location')).toBe('/roadmap/');
   });
 
   it('never serves a file outside the client folder', async () => {

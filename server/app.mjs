@@ -11,10 +11,12 @@ const IMMUTABLE = 'public, max-age=31536000, immutable';
  * @param {{
  *   clientDir: string,
  *   ssr: (req: import('node:http').IncomingMessage, res: import('node:http').ServerResponse, next: () => void) => unknown,
+ *   ssrPaths: string[],
  * }} options
  * @returns {import('node:http').RequestListener}
  */
-export function createApp({ clientDir, ssr }) {
+export function createApp({ clientDir, ssr, ssrPaths }) {
+  const onDemand = new Set(ssrPaths);
   const root = normalize(clientDir + sep);
   // Without dev mode sirv lists the folder once at start, so it can only ever serve files in it.
   const files = sirv(clientDir, {
@@ -48,6 +50,30 @@ export function createApp({ clientDir, ssr }) {
     return `/${segments.map(encodeURIComponent).join('/')}/`;
   }
 
+  /**
+   * Keeps a Range header only when it is one well-formed range. sirv passes `bytes=10-5` to
+   * createReadStream, which throws; without the header the file is sent whole.
+   */
+  function dropBadRange(req) {
+    const range = req.headers.range;
+    if (range === undefined) return;
+    const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+    const ok = match !== null && (match[1] !== '' || match[2] !== '') &&
+      (match[1] === '' || match[2] === '' || Number(match[1]) <= Number(match[2]));
+    if (!ok) delete req.headers.range;
+  }
+
+  function fail(res, err) {
+    console.error(`site: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
+    if (res.headersSent) {
+      res.destroy();
+      return;
+    }
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('Internal Server Error');
+  }
+
   function notFound(res) {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -60,6 +86,12 @@ export function createApp({ clientDir, ssr }) {
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
     const path = (req.url ?? '/').split('?')[0];
+    if (!path.endsWith('/') && onDemand.has(`${path}/`)) {
+      res.statusCode = 301;
+      res.setHeader('Location', `${path}/`);
+      res.end();
+      return;
+    }
     const folder = path.endsWith('/') ? undefined : folderUrl(path);
     if (folder !== undefined && folder !== '/') {
       // Relative, since requests reach the pod through a tunnel on another host and port.
@@ -69,6 +101,23 @@ export function createApp({ clientDir, ssr }) {
       return;
     }
 
-    files(req, res, () => ssr(req, res, () => notFound(res)));
+    dropBadRange(req);
+    // Only the pages rendered on request reach Astro, so its built-in routes (/_image,
+    // /_server-islands) are never served. A throw here must not end the process.
+    const render = () => {
+      if (!onDemand.has(path)) return notFound(res);
+      return Promise.resolve(ssr(req, res, () => notFound(res))).catch((err) => fail(res, err));
+    };
+    try {
+      files(req, res, () => {
+        try {
+          return render();
+        } catch (err) {
+          fail(res, err);
+        }
+      });
+    } catch (err) {
+      fail(res, err);
+    }
   };
 }

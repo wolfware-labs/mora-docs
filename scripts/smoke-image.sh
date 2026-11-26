@@ -82,6 +82,20 @@ get /og/docs/install.png
 [ "$(header Content-Type)" = "image/png" ] || fail "/og/docs/install.png is a PNG (got $(header Content-Type))"
 ok "/docs/install/ has a share card"
 
+curl -sS -o /dev/null -H 'Range: bytes=10-5' "$base/docs/" || true
+get /docs/
+[ "$status" = 200 ] || fail "the server still answers after an inverted Range header (got $status)"
+ok "an inverted Range header does not stop the server"
+
+get '/_image?href=/brand/favicon-32.png'
+[ "$status" = 404 ] || fail "/_image returns 404 (got $status)"
+ok "Astro's built-in routes are not served"
+
+get /roadmap
+[ "$status" = 301 ] || fail "/roadmap returns 301 (got $status)"
+[ "$(header Location)" = "/roadmap/" ] || fail "/roadmap Location is /roadmap/ (got $(header Location))"
+ok "/roadmap redirects to /roadmap/"
+
 get /docs
 [ "$status" = 301 ] || fail "/docs returns 301 (got $status)"
 [ "$(header Location)" = "/docs/" ] || fail "/docs Location is /docs/ (got $(header Location))"
