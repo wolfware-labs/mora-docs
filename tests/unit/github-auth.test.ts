@@ -109,8 +109,11 @@ describe('createAppTokenSource', () => {
 });
 
 describe('authFromEnv', () => {
+  const moraLang = { owner: 'wolfware-labs', repo: 'mora-lang' };
+
   it('uses the App when its id and key are set', async () => {
     const auth = authFromEnv(
+      moraLang,
       { GITHUB_APP_ID: '123', GITHUB_APP_PRIVATE_KEY: pem, GITHUB_TOKEN: 'ignored' },
       fakeGitHub(() => '2099-01-01T00:00:00Z'),
     );
@@ -119,19 +122,31 @@ describe('authFromEnv', () => {
 
   it('reads a key stored on one line, with \\n for each line break', async () => {
     const auth = authFromEnv(
+      moraLang,
       { GITHUB_APP_ID: '123', GITHUB_APP_PRIVATE_KEY: pem.trim().replaceAll('\n', '\\n') },
       fakeGitHub(() => '2099-01-01T00:00:00Z'),
     );
     expect(await auth()).toBe('ghs_1');
   });
 
+  it('asks for tokens of the repository it is given', async () => {
+    const calls: Call[] = [];
+    const auth = authFromEnv(
+      { owner: 'someone', repo: 'other' },
+      { GITHUB_APP_ID: '123', GITHUB_APP_PRIVATE_KEY: pem },
+      fakeGitHub(() => '2099-01-01T00:00:00Z', calls),
+    );
+    await expect(auth()).rejects.toThrow('GitHub answered 404');
+    expect(calls.map((c) => c.url)).toEqual(['https://api.github.com/repos/someone/other/installation']);
+  });
+
   it('falls back to GITHUB_TOKEN, then to no token', async () => {
-    expect(await authFromEnv({ GITHUB_TOKEN: 'local' })()).toBe('local');
-    expect(await authFromEnv({})()).toBeUndefined();
+    expect(await authFromEnv(moraLang, { GITHUB_TOKEN: 'local' })()).toBe('local');
+    expect(await authFromEnv(moraLang, {})()).toBeUndefined();
   });
 
   it('refuses half an App configuration', () => {
-    expect(() => authFromEnv({ GITHUB_APP_ID: '123' })).toThrow('GITHUB_APP_PRIVATE_KEY');
-    expect(() => authFromEnv({ GITHUB_APP_PRIVATE_KEY: pem })).toThrow('GITHUB_APP_ID');
+    expect(() => authFromEnv(moraLang, { GITHUB_APP_ID: '123' })).toThrow('GITHUB_APP_PRIVATE_KEY');
+    expect(() => authFromEnv(moraLang, { GITHUB_APP_PRIVATE_KEY: pem })).toThrow('GITHUB_APP_ID');
   });
 });

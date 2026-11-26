@@ -1,11 +1,14 @@
 // The site's HTTP handler: prerendered files from the client folder, the pages Astro renders on
 // each request (the landing and the roadmap), and the 404 page for everything else.
 // scripts/smoke-image.sh checks the same behaviour on the built image.
-import { existsSync, readFileSync } from 'node:fs';
-import { join, normalize, sep } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, normalize, relative, sep } from 'node:path';
 import sirv from 'sirv';
 
 const IMMUTABLE = 'public, max-age=31536000, immutable';
+
+/** The pages with `export const prerender = false`, which Astro renders on each request. */
+export const ON_DEMAND_PATHS = ['/', '/roadmap/'];
 
 /**
  * @param {{
@@ -31,6 +34,12 @@ export function createApp({ clientDir, ssr, ssrPaths }) {
     },
   });
   const notFoundPage = readFileSync(join(clientDir, '404.html'));
+  // The folders that hold an index.html ("docs/language"), listed once at start as sirv does.
+  const folders = new Set(
+    readdirSync(clientDir, { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name === 'index.html')
+      .map((entry) => relative(clientDir, entry.parentPath).split(sep).join('/')),
+  );
 
   /**
    * The canonical URL of the folder `path` names, when it is a folder of the client dir that
@@ -45,8 +54,9 @@ export function createApp({ clientDir, ssr, ssrPaths }) {
       return undefined;
     }
     const full = normalize(join(root, decoded));
-    if (!full.startsWith(root) || !existsSync(join(full, 'index.html'))) return undefined;
+    if (!full.startsWith(root)) return undefined;
     const segments = full.slice(root.length).split(sep).filter(Boolean);
+    if (!folders.has(segments.join('/'))) return undefined;
     return `/${segments.map(encodeURIComponent).join('/')}/`;
   }
 

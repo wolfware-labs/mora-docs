@@ -86,9 +86,10 @@ export function createAppTokenSource({
 
 /**
  * The GitHub App when GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY are set (the deployed site),
- * else GITHUB_TOKEN (local runs and CI), else no token.
+ * with tokens limited to `repository`; else GITHUB_TOKEN (local runs and CI), else no token.
  */
 export function authFromEnv(
+  repository: { owner: string; repo: string },
   env: Record<string, string | undefined> = process.env,
   fetch: typeof globalThis.fetch = globalThis.fetch,
 ): TokenSource {
@@ -96,7 +97,7 @@ export function authFromEnv(
   // A secret store with one-line fields keeps the PEM with a literal \n for each line break.
   const privateKey = env.GITHUB_APP_PRIVATE_KEY?.replaceAll('\\n', '\n');
   if (appId && privateKey) {
-    return createAppTokenSource({ appId, privateKey, owner: 'wolfware-labs', repo: 'mora-lang', fetch });
+    return createAppTokenSource({ appId, privateKey, ...repository, fetch });
   }
   if (appId) throw new Error('GITHUB_APP_ID is set without GITHUB_APP_PRIVATE_KEY');
   if (privateKey) throw new Error('GITHUB_APP_PRIVATE_KEY is set without GITHUB_APP_ID');

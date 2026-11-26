@@ -1,8 +1,9 @@
 import snapshot from '../data/roadmap.snapshot.json' with { type: 'json' };
 import { authFromEnv, type TokenSource } from './github-auth';
 
-const REPO = 'wolfware-labs/mora-lang';
-const API = `https://api.github.com/repos/${REPO}`;
+const OWNER = 'wolfware-labs';
+const REPO = 'mora-lang';
+const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
 /** Ideas being evaluated carry this label and no milestone. */
 const EXPLORE_LABEL = 'explore';
 /** Milestones from this one on are post-MVP; the roadmap lists their issues. */
@@ -23,7 +24,7 @@ export type Milestone = {
 };
 
 export type Roadmap = {
-  /** When the data was fetched: an ISO timestamp, or a bare date in older snapshots. */
+  /** When the data was fetched, as an ISO timestamp. */
   asOf: string;
   milestones: Milestone[];
   explorations: Issue[];
@@ -37,12 +38,10 @@ export function milestoneStatus(m: Pick<Milestone, 'open' | 'closed'>): Mileston
   return 'planned';
 }
 
-/** "November 26, 2026, 15:04 UTC" for a timestamp, "November 2, 2026" for a bare date. */
+/** "2026-11-26T15:04:09.000Z" becomes "November 26, 2026, 15:04 UTC". */
 export function updatedText(asOf: string): string {
-  const bareDate = /^\d{4}-\d{2}-\d{2}$/.test(asOf);
-  const when = new Date(bareDate ? `${asOf}T00:00:00Z` : asOf);
+  const when = new Date(asOf);
   const date = when.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-  if (bareDate) return date;
   const time = when.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
   return `${date}, ${time} UTC`;
 }
@@ -113,7 +112,7 @@ export function fromSnapshot(): Roadmap {
 let envAuth: TokenSource | undefined;
 /** Read from the environment on first use, so one App token serves every refresh. */
 function defaultAuth(): TokenSource {
-  envAuth ??= authFromEnv();
+  envAuth ??= authFromEnv({ owner: OWNER, repo: REPO });
   return envAuth;
 }
 

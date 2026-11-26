@@ -1,13 +1,16 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createApp } from '../../server/app.mjs';
+import { ON_DEMAND_PATHS, createApp } from '../../server/app.mjs';
 
 type Ssr = (req: IncomingMessage, res: ServerResponse, next: () => void) => void;
 
+// The client folder sits inside `root`, so a test can put a file just outside it.
+let root: string;
 let dir: string;
 let server: Server;
 let base: string;
@@ -27,10 +30,12 @@ const ssr: Ssr = (req, res, next) => {
 };
 
 beforeAll(async () => {
-  dir = mkdtempSync(join(tmpdir(), 'mora-server-'));
-  mkdirSync(join(dir, 'docs'));
+  root = mkdtempSync(join(tmpdir(), 'mora-server-'));
+  dir = join(root, 'client');
+  mkdirSync(join(dir, 'docs', 'language'), { recursive: true });
   mkdirSync(join(dir, '_astro'));
   writeFileSync(join(dir, 'docs', 'index.html'), '<title>docs</title>');
+  writeFileSync(join(dir, 'docs', 'language', 'index.html'), '<title>language</title>');
   writeFileSync(join(dir, '_astro', 'site.abc123.css'), 'body{}');
   writeFileSync(join(dir, '404.html'), '<title>Not found</title>');
   writeFileSync(join(dir, 'llms.txt'), 'Mora');
@@ -44,7 +49,7 @@ beforeAll(async () => {
 
 afterAll(() => {
   server.close();
-  rmSync(dir, { recursive: true, force: true });
+  rmSync(root, { recursive: true, force: true });
 });
 
 const get = (path: string) => fetch(`${base}${path}`, { redirect: 'manual' });
@@ -81,6 +86,12 @@ describe('createApp', () => {
     const res = await get('/docs');
     expect(res.status).toBe(301);
     expect(res.headers.get('location')).toBe('/docs/');
+  });
+
+  it('redirects a nested folder without its slash', async () => {
+    const res = await get('/docs/language');
+    expect(res.status).toBe(301);
+    expect(res.headers.get('location')).toBe('/docs/language/');
   });
 
   it('never redirects to another host', async () => {
@@ -141,16 +152,26 @@ describe('createApp', () => {
   });
 
   it('never serves a file outside the client folder', async () => {
-    writeFileSync(join(dir, '..', 'mora-secret.txt'), 'secret');
+    writeFileSync(join(root, 'mora-secret.txt'), 'secret');
     const res = await get('/..%2Fmora-secret.txt');
     expect(res.status).toBe(404);
     expect(await res.text()).not.toContain('secret');
-    rmSync(join(dir, '..', 'mora-secret.txt'));
   });
 
   it('does not name its server software', async () => {
     const res = await get('/docs/');
     expect(res.headers.get('server')).toBeNull();
     expect(res.headers.get('x-powered-by')).toBeNull();
+  });
+});
+
+describe('ON_DEMAND_PATHS', () => {
+  it('lists exactly the pages that opt out of prerendering', () => {
+    const pages = fileURLToPath(new URL('../../src/pages/', import.meta.url));
+    const onDemand = readdirSync(pages, { recursive: true, encoding: 'utf8' })
+      .filter((file) => /\.(astro|ts)$/.test(file))
+      .filter((file) => /^export const prerender = false;$/m.test(readFileSync(join(pages, file), 'utf8')))
+      .map((file) => `/${file.replace(/\.(astro|ts)$/, '').replace(/(^|\/)index$/, '')}/`.replace('//', '/'));
+    expect([...ON_DEMAND_PATHS].sort()).toEqual(onDemand.sort());
   });
 });

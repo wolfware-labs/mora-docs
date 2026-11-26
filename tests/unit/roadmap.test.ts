@@ -165,11 +165,7 @@ describe('createRoadmapCache', () => {
 });
 
 describe('updatedText', () => {
-  it('shows the date and the UTC time of a timestamp', () => {
+  it('shows the date and the UTC time', () => {
     expect(updatedText('2026-11-26T15:04:09.000Z')).toBe('November 26, 2026, 15:04 UTC');
-  });
-
-  it('shows only the date of a bare date', () => {
-    expect(updatedText('2026-11-02')).toBe('November 2, 2026');
   });
 });
