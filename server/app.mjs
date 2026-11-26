@@ -51,13 +51,14 @@ export function createApp({ clientDir, ssr, ssrPaths }) {
   }
 
   /**
-   * Keeps a Range header only when it is one well-formed range. sirv passes `bytes=10-5` to
-   * createReadStream, which throws; without the header the file is sent whole.
+   * Keeps a Range header only when it is one well-formed range of at most 15 digits per number.
+   * sirv passes `bytes=10-5`, or an end above 2^53, to createReadStream, which throws; without
+   * the header the file is sent whole.
    */
   function dropBadRange(req) {
     const range = req.headers.range;
     if (range === undefined) return;
-    const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+    const match = /^bytes=(\d{0,15})-(\d{0,15})$/.exec(range);
     const ok = match !== null && (match[1] !== '' || match[2] !== '') &&
       (match[1] === '' || match[2] === '' || Number(match[1]) <= Number(match[2]));
     if (!ok) delete req.headers.range;

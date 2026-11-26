@@ -114,6 +114,12 @@ describe('createApp', () => {
     expect((await get('/docs/')).status).toBe(200);
   });
 
+  it('sends the whole file for a Range past the largest safe integer', async () => {
+    const res = await fetch(`${base}/docs/`, { headers: { Range: 'bytes=0-99999999999999999999' } });
+    expect(res.status).toBe(200);
+    expect(await res.text()).toBe('<title>docs</title>');
+  });
+
   it('answers 500 when rendering throws, and keeps answering', async () => {
     const res = await get('/boom/');
     expect(res.status).toBe(500);
