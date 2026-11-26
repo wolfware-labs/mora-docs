@@ -3,6 +3,13 @@
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { ON_DEMAND_PATHS, createApp } from './app.mjs';
+import { appConfigProblem } from './github-app-config.mjs';
+
+const problem = appConfigProblem(process.env);
+if (problem !== undefined) {
+  console.error(`site: ${problem}`);
+  process.exit(1);
+}
 
 const out = new URL(`../${process.env.MORA_OUT_DIR || 'dist'}/`, import.meta.url);
 const { handler } = await import(new URL('server/entry.mjs', out).href);

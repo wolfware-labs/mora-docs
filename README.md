@@ -21,7 +21,7 @@ MORA_LANG_DIR=../lang pnpm dev
 |---|---|
 | `pnpm dev` | Syncs the docs and starts the dev server |
 | `pnpm build` | Syncs the docs and builds the site into `dist/`: prerendered pages in `dist/client/`, the server bundle in `dist/server/` |
-| `pnpm start` | Serves the built site on port 8080 (`PORT`); set `GITHUB_TOKEN` for the roadmap, or `ROADMAP_OFFLINE=1` to keep the snapshot |
+| `pnpm start` | Serves the built site on port 8080 (`PORT`); set `GITHUB_TOKEN` for the roadmap, or `ROADMAP_OFFLINE=1` to keep the snapshot; exits at once when the GitHub App settings (see Deploy) are unusable |
 | `pnpm typecheck` | Type-checks the site |
 | `pnpm test` | Unit tests |
 | `pnpm test:e2e` | Builds the site, serves it with the roadmap snapshot and runs the Playwright tests (`PW_PORT` when 4321 is taken) |
@@ -31,7 +31,7 @@ The signup form appears only when `PUBLIC_MAILERLITE_ACTION` is set to a MailerL
 
 ## Deploy
 
-Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into a Node image (`server/main.mjs`), smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. A nightly run rebuilds the image the same way, so the docs follow the language spec, which the build reads from mora-lang. The roadmap needs no rebuild: the running site reads GitHub itself. Deployed, it signs in as a GitHub App (`GITHUB_APP_ID` and `GITHUB_APP_PRIVATE_KEY`, the PEM key with real or `\n` line breaks) and asks for hourly tokens limited to reading mora-lang's issues; without them it uses `GITHUB_TOKEN`, then no token.
+Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into a Node image (`server/main.mjs`), smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. A nightly run rebuilds the image the same way, so the docs follow the language spec, which the build reads from mora-lang. The roadmap needs no rebuild: the running site reads GitHub itself. Deployed, it signs in as a GitHub App (`GITHUB_APP_ID` and `GITHUB_APP_PRIVATE_KEY`, the PEM key with real or `\n` line breaks) and asks for hourly tokens limited to reading mora-lang's issues; without them it uses `GITHUB_TOKEN`, then no token. The server refuses to start when only one of the two is set, or when the key is not an RSA private key it can sign with; it checks this without calling GitHub, so an outage there never stops it.
 
 ## License
 
