@@ -144,6 +144,19 @@ describe('createRoadmapCache', () => {
     expect(loads()).toBe(2);
   });
 
+  it('starts no second load while one is still pending past the TTL', async () => {
+    let resolve: (roadmap: Roadmap) => void = () => {};
+    const { cache, loads, advance } = setup(() => new Promise<Roadmap>((r) => (resolve = r)));
+    cache.get();
+    advance(600_001);
+    expect(cache.get().asOf).toBe('snapshot');
+    expect(loads()).toBe(1);
+    resolve(data('live'));
+    await tick();
+    expect(cache.get().asOf).toBe('live');
+    expect(loads()).toBe(2);
+  });
+
   it('keeps the last good data when a refresh fails, and waits a TTL before retrying', async () => {
     let fail = false;
     const { cache, loads, advance } = setup(async () => {
