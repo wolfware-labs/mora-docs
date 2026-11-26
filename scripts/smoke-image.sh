@@ -6,8 +6,8 @@ set -euo pipefail
 image="${1:?usage: smoke-image.sh <image-ref>}"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-marker="$(grep -o '<title>[^<]*' "$root/dist/404.html" | head -1 | sed 's/^<title>//')"
-[ -n "$marker" ] || { echo "FAIL: no <title> in dist/404.html"; exit 1; }
+marker="$(grep -o '<title>[^<]*' "$root/dist/client/404.html" | head -1 | sed 's/^<title>//')"
+[ -n "$marker" ] || { echo "FAIL: no <title> in dist/client/404.html"; exit 1; }
 
 cid=""
 tmp="$(mktemp -d)"
@@ -20,7 +20,8 @@ trap cleanup EXIT
 fail() { echo "FAIL: $1"; exit 1; }
 ok() { echo "ok: $1"; }
 
-cid="$(docker run -d -p 127.0.0.1::8080 "$image")" || fail "container starts"
+# ROADMAP_OFFLINE keeps the roadmap on the committed snapshot, so the check never waits on GitHub.
+cid="$(docker run -d -e ROADMAP_OFFLINE=1 -p 127.0.0.1::8080 "$image")" || fail "container starts"
 port="$(docker port "$cid" 8080/tcp | head -1 | sed 's/.*://')"
 base="http://127.0.0.1:$port"
 
@@ -50,8 +51,16 @@ ok "/ Cache-Control: no-cache"
 ok "/ X-Content-Type-Options: nosniff"
 [ "$(header Referrer-Policy)" = "strict-origin-when-cross-origin" ] || fail "/ Referrer-Policy"
 ok "/ Referrer-Policy: strict-origin-when-cross-origin"
-if header Server | grep -Eq '[0-9]'; then fail "/ Server hides the nginx version"; fi
+if header Server | grep -Eq '[0-9]'; then fail "/ Server header names no version"; fi
 ok "/ Server has no version"
+
+# The landing and the roadmap are rendered on each request, with the same headers.
+get /roadmap/
+[ "$status" = 200 ] || fail "/roadmap/ returns 200 (got $status)"
+grep -q 'data-testid="as-of"' "$tmp/b" || fail "/roadmap/ shows when its data was fetched"
+[ "$(header Cache-Control)" = "no-cache" ] || fail "/roadmap/ Cache-Control is no-cache"
+[ "$(header X-Content-Type-Options)" = "nosniff" ] || fail "/roadmap/ X-Content-Type-Options is nosniff"
+ok "/roadmap/ is rendered with the security headers"
 
 get /docs/
 [ "$status" = 200 ] || fail "/docs/ returns 200 (got $status)"
@@ -93,6 +102,9 @@ get "$css"
 ok "$css is cached as immutable"
 [ "$(header X-Content-Type-Options)" = "nosniff" ] || fail "$css keeps security headers"
 ok "$css keeps security headers"
+status="$(curl -sS -H 'Accept-Encoding: gzip' -D "$tmp/h" -o /dev/null -w '%{http_code}' "$base$css")"
+[ "$(header Content-Encoding)" = "gzip" ] || fail "$css is served gzipped to a client that accepts it"
+ok "$css is served gzipped"
 
 uid="$(docker exec "$cid" id -u)"
 [ "$uid" != 0 ] || fail "container user is not root"

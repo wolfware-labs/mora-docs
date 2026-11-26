@@ -5,7 +5,7 @@ The website for the [Mora programming language](https://github.com/wolfware-labs
 ## Where the content comes from
 
 - **Docs pages** are generated from the language repository on every `dev` and `build` by `scripts/sync-spec.mjs`: the spec sections listed in `scripts/lib/doc-pages.mjs`, one page per file in `docs/errors/`, and the grammar `crates/mora-syntax/mora.ungram`. The generated files in `src/content/docs/docs/` are not committed. To change what a page says, change the spec.
-- **The roadmap** reads milestones and issues from the GitHub API at build time. When GitHub cannot be reached, it falls back to `src/data/roadmap.snapshot.json`. The release lines and the milestone descriptions are in `src/data/releases.ts`.
+- **The roadmap** reads milestones and issues from the GitHub API while the site runs. The landing page and `/roadmap/` are rendered on each request from a copy the server refreshes every 5 minutes; a failed refresh keeps the last good copy, and the server starts from `src/data/roadmap.snapshot.json`. The release lines and the milestone descriptions are in `src/data/releases.ts`.
 - **The landing page** is `src/pages/index.astro`.
 
 ## Develop
@@ -20,17 +20,18 @@ MORA_LANG_DIR=../lang pnpm dev
 | Command | Does |
 |---|---|
 | `pnpm dev` | Syncs the docs and starts the dev server |
-| `pnpm build` | Syncs the docs and builds the site into `dist/` |
+| `pnpm build` | Syncs the docs and builds the site into `dist/`: prerendered pages in `dist/client/`, the server bundle in `dist/server/` |
+| `pnpm start` | Serves the built site on port 8080 (`PORT`); set `GITHUB_TOKEN` for the roadmap, or `ROADMAP_OFFLINE=1` to keep the snapshot |
 | `pnpm typecheck` | Type-checks the site |
 | `pnpm test` | Unit tests |
-| `pnpm test:e2e` | Builds the site with the roadmap snapshot and runs the Playwright tests |
+| `pnpm test:e2e` | Builds the site, serves it with the roadmap snapshot and runs the Playwright tests (`PW_PORT` when 4321 is taken) |
 | `pnpm snapshot` | Refreshes `src/data/roadmap.snapshot.json` from GitHub (set `GITHUB_TOKEN`) |
 
 The signup form appears only when `PUBLIC_MAILERLITE_ACTION` is set to a MailerLite form endpoint.
 
 ## Deploy
 
-Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into an nginx image, smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. mora-lang sends a `roadmap-changed` dispatch when a milestone changes, or an issue that is in a milestone or labelled `explore` changes, which rebuilds the image so the roadmap follows GitHub within minutes; a nightly run rebuilds it too, in case a dispatch is missed.
+Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into a Node image (`server/main.mjs`), smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. The roadmap needs no rebuild: the running site reads GitHub itself, with a read-only token in `GITHUB_TOKEN`.
 
 ## License
 

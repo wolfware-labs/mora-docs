@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { fetchRoadmap, loadRoadmap, milestoneStatus, parseTitle, progress } from '../../src/lib/roadmap';
+import {
+  createRoadmapCache,
+  fetchRoadmap,
+  milestoneStatus,
+  parseTitle,
+  progress,
+  type Roadmap,
+  updatedText,
+} from '../../src/lib/roadmap';
 
 const milestone = (number: number, title: string, open: number, closed: number) => ({
   number,
@@ -65,7 +73,7 @@ describe('fetchRoadmap', () => {
         calls,
       ),
     });
-    expect(roadmap.asOf).toBe('2026-11-02');
+    expect(roadmap.asOf).toBe('2026-11-02T12:00:00.000Z');
     expect(roadmap.milestones.map((m) => m.code)).toEqual(['M0', 'M8']);
     expect(roadmap.milestones[0].issues).toEqual([]);
     expect(roadmap.milestones[1].issues.map((i) => i.number)).toEqual([184]);
@@ -78,10 +86,79 @@ describe('fetchRoadmap', () => {
   });
 });
 
-describe('loadRoadmap', () => {
-  it('falls back to the snapshot when GitHub fails', async () => {
-    const failing = (async () => new Response('', { status: 503 })) as unknown as typeof fetch;
-    const roadmap = await loadRoadmap({ fetch: failing });
-    expect(roadmap.milestones.length).toBeGreaterThan(0);
+describe('createRoadmapCache', () => {
+  const data = (asOf: string): Roadmap => ({ asOf, milestones: [], explorations: [] });
+  const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  function setup(load: () => Promise<Roadmap>) {
+    let t = 1_000_000;
+    let loads = 0;
+    const cache = createRoadmapCache({
+      initial: data('snapshot'),
+      ttlMs: 300_000,
+      now: () => t,
+      load: () => {
+        loads += 1;
+        return load();
+      },
+    });
+    return { cache, loads: () => loads, advance: (ms: number) => (t += ms) };
+  }
+
+  it('answers with the snapshot at once and refreshes it in the background', async () => {
+    const { cache, loads } = setup(async () => data('live'));
+    expect(cache.get().asOf).toBe('snapshot');
+    expect(loads()).toBe(1);
+    await tick();
+    expect(cache.get().asOf).toBe('live');
+  });
+
+  it('does not ask GitHub again within the TTL', async () => {
+    const { cache, loads, advance } = setup(async () => data('live'));
+    cache.get();
+    await tick();
+    advance(299_000);
+    cache.get();
+    expect(loads()).toBe(1);
+  });
+
+  it('refreshes once when stale, however many requests arrive', async () => {
+    const { cache, loads, advance } = setup(async () => data('live'));
+    cache.get();
+    await tick();
+    advance(300_001);
+    cache.get();
+    cache.get();
+    cache.get();
+    expect(loads()).toBe(2);
+  });
+
+  it('keeps the last good data when a refresh fails, and waits a TTL before retrying', async () => {
+    let fail = false;
+    const { cache, loads, advance } = setup(async () => {
+      if (fail) throw new Error('GitHub answered 503');
+      return data('live');
+    });
+    cache.get();
+    await tick();
+    fail = true;
+    advance(300_001);
+    cache.get();
+    await tick();
+    expect(cache.get().asOf).toBe('live');
+    expect(loads()).toBe(2);
+    advance(300_001);
+    cache.get();
+    expect(loads()).toBe(3);
+  });
+});
+
+describe('updatedText', () => {
+  it('shows the date and the UTC time of a timestamp', () => {
+    expect(updatedText('2026-11-26T15:04:09.000Z')).toBe('November 26, 2026, 15:04 UTC');
+  });
+
+  it('shows only the date of a bare date', () => {
+    expect(updatedText('2026-11-02')).toBe('November 2, 2026');
   });
 });

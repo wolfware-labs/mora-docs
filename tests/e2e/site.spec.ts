@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import snapshot from '../../src/data/roadmap.snapshot.json' with { type: 'json' };
 import { RELEASES } from '../../src/data/releases';
@@ -79,6 +80,18 @@ test('the roadmap matches the snapshot', async ({ page }) => {
   for (const e of snapshot.explorations) {
     await expect(page.getByRole('link', { name: `#${e.number} ${e.title}` })).toBeVisible();
   }
+});
+
+test('the landing page and the roadmap are rendered on each request, not at build time', () => {
+  // The build writes prerendered pages as files; these two must come from the server instead.
+  expect(existsSync('dist-e2e/client/index.html')).toBe(false);
+  expect(existsSync('dist-e2e/client/roadmap/index.html')).toBe(false);
+  expect(existsSync('dist-e2e/client/docs/index.html')).toBe(true);
+});
+
+test('the roadmap says when its data was fetched', async ({ page }) => {
+  await page.goto('/roadmap/');
+  await expect(page.locator('main')).toContainText('Progress below is live from GitHub, updated');
 });
 
 test('docs pages are generated from the spec, with match in code', async ({ page }) => {

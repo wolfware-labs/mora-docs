@@ -2,20 +2,17 @@
 import Site from '../layouts/Site.astro';
 import { ROADMAP_DESCRIPTION } from '../data/pages';
 import { MILESTONE_NOTES, RELEASES } from '../data/releases';
-import { milestoneStatus, progress, roadmap, type Milestone } from '../lib/roadmap';
+import { milestoneStatus, progress, roadmap, updatedText, type Milestone } from '../lib/roadmap';
 
-const { asOf, milestones, explorations } = await roadmap();
+export const prerender = false;
+
+const { asOf, milestones, explorations } = roadmap();
 const byCode = new Map(milestones.map((m) => [m.code, m]));
 const lines = RELEASES.map((r) => ({
   ...r,
   milestones: r.milestones.map((code) => byCode.get(code)).filter((m): m is Milestone => m !== undefined),
 }));
-const asOfText = new Date(`${asOf}T00:00:00Z`).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  timeZone: 'UTC',
-});
+const asOfText = updatedText(asOf);
 const closedText = (m: { closed: number; total: number }) => `${m.closed} of ${m.total} issues closed`;
 const STATUS = {
   done: { label: 'Done', bg: '#1F3320', fg: '#8FD18F' },
@@ -38,7 +35,7 @@ const grid = 'margin: 28px 0 0; padding: 0; list-style: none; display: grid; gri
     <p style={eyebrow}>Roadmap</p>
     <h1 style="margin: 16px 0 0; font-family: Unbounded, sans-serif; font-weight: 500; font-size: clamp(34px, 4.4vw, 54px); line-height: 1.08">Where Mora is headed.</h1>
     <p style="margin: 20px 0 0; max-width: 44em; font-size: 18px; color: #D9CCD3">
-      Every deliverable is a GitHub issue. Progress below is a snapshot of the milestones as of <time datetime={asOf} data-testid="as-of">{asOfText}</time>; the site refreshes it on each deploy.
+      Every deliverable is a GitHub issue. Progress below is live from GitHub, updated <time datetime={asOf} data-testid="as-of">{asOfText}</time>.
     </p>
     <ol style="margin: 32px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px">
       {lines.map((r, i) => <li><a href={`#${r.id}`} style={chip(i === 0)}>{r.version}{r.label ? ` · ${r.label}` : ''}</a></li>)}

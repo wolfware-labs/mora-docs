@@ -3,6 +3,9 @@ import Site from '../layouts/Site.astro';
 import RoadmapTeaser from '../components/landing/RoadmapTeaser.astro';
 import Signup from '../components/landing/Signup.astro';
 import { INTRO, POINTS, detailParts } from '../data/pitch';
+
+// The roadmap teaser shows live counts.
+export const prerender = false;
 ---
 
 <Site

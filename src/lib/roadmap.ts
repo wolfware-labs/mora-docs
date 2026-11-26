@@ -22,7 +22,7 @@ export type Milestone = {
 };
 
 export type Roadmap = {
-  /** ISO date of the data, the day it was fetched. */
+  /** When the data was fetched: an ISO timestamp, or a bare date in older snapshots. */
   asOf: string;
   milestones: Milestone[];
   explorations: Issue[];
@@ -34,6 +34,16 @@ export function milestoneStatus(m: Pick<Milestone, 'open' | 'closed'>): Mileston
   if (m.closed > 0 && m.open === 0) return 'done';
   if (m.closed > 0) return 'in-progress';
   return 'planned';
+}
+
+/** "November 26, 2026, 15:04 UTC" for a timestamp, "November 2, 2026" for a bare date. */
+export function updatedText(asOf: string): string {
+  const bareDate = /^\d{4}-\d{2}-\d{2}$/.test(asOf);
+  const when = new Date(bareDate ? `${asOf}T00:00:00Z` : asOf);
+  const date = when.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+  if (bareDate) return date;
+  const time = when.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+  return `${date}, ${time} UTC`;
 }
 
 /** "M6: Async and HTTP" becomes { code: "M6", name: "Async and HTTP" }. */
@@ -144,30 +154,61 @@ export async function fetchRoadmap({
   );
 
   return {
-    asOf: now.toISOString().slice(0, 10),
+    asOf: now.toISOString(),
     milestones: milestones.filter((m) => m.code !== '').sort(byNumber),
     explorations: await issues(`milestone=none&labels=${EXPLORE_LABEL}`),
   };
 }
 
+type CacheOptions = {
+  /** What to serve until the first refresh lands. */
+  initial: Roadmap;
+  load: () => Promise<Roadmap>;
+  ttlMs: number;
+  now?: () => number;
+};
+
 /**
- * The live roadmap, or the committed snapshot when ROADMAP_OFFLINE is set or GitHub
- * cannot be reached. A failed fetch never fails the build.
+ * Stale-while-revalidate: get() answers at once with the data it holds and, when that is
+ * older than the TTL, starts one background refresh. A failed refresh keeps the last good
+ * data and is retried after another TTL, so an outage at GitHub never reaches a reader.
  */
-export async function loadRoadmap(options: Options = {}): Promise<Roadmap> {
-  if (process.env.ROADMAP_OFFLINE) return fromSnapshot();
-  try {
-    return await fetchRoadmap(options);
-  } catch (err) {
-    console.warn(`roadmap: using the committed snapshot (${(err as Error).message})`);
-    return fromSnapshot();
+export function createRoadmapCache({ initial, load, ttlMs, now = Date.now }: CacheOptions) {
+  let data = initial;
+  let checkedAt = Number.NEGATIVE_INFINITY;
+  let refreshing = false;
+
+  function refresh() {
+    refreshing = true;
+    checkedAt = now();
+    load()
+      .then((fresh) => {
+        data = fresh;
+      })
+      .catch((err: Error) => console.warn(`roadmap: keeping the data from ${data.asOf} (${err.message})`))
+      .finally(() => {
+        refreshing = false;
+      });
   }
+
+  return {
+    get(): Roadmap {
+      if (!refreshing && now() - checkedAt > ttlMs) refresh();
+      return data;
+    },
+  };
 }
 
-let cached: Promise<Roadmap> | undefined;
+/** How long the server serves the roadmap before it asks GitHub again. */
+const TTL_MS = 5 * 60 * 1000;
 
-/** loadRoadmap, fetched once per build and shared by every page. */
-export function roadmap(): Promise<Roadmap> {
-  cached ??= loadRoadmap();
-  return cached;
+const live = createRoadmapCache({
+  initial: fromSnapshot(),
+  load: () => (process.env.ROADMAP_OFFLINE ? Promise.resolve(fromSnapshot()) : fetchRoadmap()),
+  ttlMs: TTL_MS,
+});
+
+/** The roadmap the server renders: live from GitHub, at most a TTL old. */
+export function roadmap(): Roadmap {
+  return live.get();
 }

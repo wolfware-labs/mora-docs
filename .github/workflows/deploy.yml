@@ -5,14 +5,6 @@ name: Deploy
 on:
   push:
     branches: [main]
-  # mora-lang sends roadmap-changed when a milestone changes, or an issue
-  # that is in a milestone or labelled explore changes, so the roadmap page
-  # follows GitHub within minutes. The nightly run stays as a fallback for a
-  # missed dispatch.
-  repository_dispatch:
-    types: [roadmap-changed]
-  schedule:
-    - cron: "23 6 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -73,7 +65,7 @@ jobs:
             docker push "$ref"
           done <<< "$refs"
         env:
-          # Nightly and manual runs rebuild the release commit, so only the push that made it moves site-<version>.
+          # Manual runs rebuild the release commit, so only the push that made it moves site-<version>.
           RELEASE_TAGS: ${{ github.event_name == 'push' && 'true' || '' }}
           IMAGE_REPO: docker.io/wolfware/mora-site
           RUN_NUMBER: ${{ github.run_number }}

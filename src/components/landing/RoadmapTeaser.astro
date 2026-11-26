@@ -2,7 +2,7 @@
 import { RELEASES, TEASERS } from '../../data/releases';
 import { progress, roadmap } from '../../lib/roadmap';
 
-const { milestones } = await roadmap();
+const { milestones } = roadmap();
 const [mvp, ...later] = RELEASES;
 const mvpProgress = progress(milestones.filter((m) => mvp.milestones.includes(m.code)));
 const first = mvp.milestones[0];

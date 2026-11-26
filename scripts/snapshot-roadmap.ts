@@ -1,5 +1,5 @@
 // Refreshes src/data/roadmap.snapshot.json from GitHub: `pnpm snapshot`.
-// The snapshot is what the site shows when GitHub cannot be reached, and what the e2e tests check.
+// The snapshot is what the server shows until its first fetch from GitHub lands, and what the e2e tests check.
 import { writeFile } from 'node:fs/promises';
 import { fetchRoadmap } from '../src/lib/roadmap.ts';
 
