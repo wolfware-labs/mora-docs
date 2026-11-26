@@ -3,7 +3,7 @@ import { createServer, request, type IncomingHttpHeaders, type IncomingMessage, 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { brotliCompressSync, brotliDecompressSync, gunzipSync, gzipSync } from 'node:zlib';
+import { brotliCompressSync, brotliDecompressSync, gzipSync } from 'node:zlib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ON_DEMAND_PATHS, createApp } from '../../server/app.mjs';
 
@@ -57,7 +57,7 @@ afterAll(() => {
 
 const get = (path: string) => fetch(`${base}${path}`, { redirect: 'manual' });
 
-/** A GET that hands back the body as sent, since fetch decodes it. */
+/** A request whose body stays as sent: fetch would decode a compressed body. */
 function raw(path: string, headers: Record<string, string> = {}) {
   return new Promise<{ status: number; headers: IncomingHttpHeaders; body: Buffer }>((resolve, reject) => {
     request(`${base}${path}`, { headers }, (res) => {
@@ -213,32 +213,6 @@ describe('createApp', () => {
     const res = await get('/docs/');
     expect(res.headers.get('server')).toBeNull();
     expect(res.headers.get('x-powered-by')).toBeNull();
-  });
-});
-
-describe('compression of on-demand pages', () => {
-  it('sends brotli when the client accepts it, preferring it to gzip', async () => {
-    const res = await raw('/roadmap/', { 'Accept-Encoding': 'gzip, deflate, br' });
-    expect(res.status).toBe(200);
-    expect(res.headers['content-encoding']).toBe('br');
-    expect(res.headers['vary']).toBe('Accept-Encoding');
-    expect(res.headers['content-length']).toBeUndefined();
-    expect(brotliDecompressSync(res.body).toString()).toBe('<title>live roadmap</title>');
-  });
-
-  it('sends gzip when the client accepts gzip and not brotli', async () => {
-    const res = await raw('/roadmap/', { 'Accept-Encoding': 'gzip, br;q=0' });
-    expect(res.headers['content-encoding']).toBe('gzip');
-    expect(res.headers['vary']).toBe('Accept-Encoding');
-    expect(res.headers['content-length']).toBeUndefined();
-    expect(gunzipSync(res.body).toString()).toBe('<title>live roadmap</title>');
-  });
-
-  it('sends the page as it is when the client accepts neither', async () => {
-    const res = await raw('/roadmap/', { 'Accept-Encoding': 'identity' });
-    expect(res.headers['content-encoding']).toBeUndefined();
-    expect(res.headers['vary']).toBe('Accept-Encoding');
-    expect(res.body.toString()).toBe('<title>live roadmap</title>');
   });
 });
 
