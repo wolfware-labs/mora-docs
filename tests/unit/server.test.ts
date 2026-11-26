@@ -94,6 +94,18 @@ describe('createApp', () => {
     expect(res.headers.get('location')).toBe('/docs/language/');
   });
 
+  it('keeps the query string when it redirects a folder', async () => {
+    const res = await get('/docs/language?utm_source=x&a=1');
+    expect(res.status).toBe(301);
+    expect(res.headers.get('location')).toBe('/docs/language/?utm_source=x&a=1');
+  });
+
+  it('keeps the query string when it redirects an on-demand page', async () => {
+    const res = await get('/roadmap?utm_source=x');
+    expect(res.status).toBe(301);
+    expect(res.headers.get('location')).toBe('/roadmap/?utm_source=x');
+  });
+
   it('never redirects to another host', async () => {
     for (const path of ['//docs', '/\\docs', '/%2Fdocs']) {
       const res = await get(path);

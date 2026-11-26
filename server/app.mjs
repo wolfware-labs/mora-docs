@@ -96,10 +96,14 @@ export function createApp({ clientDir, ssr, ssrPaths }) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-    const path = (req.url ?? '/').split('?')[0];
+    const url = req.url ?? '/';
+    const queryAt = url.indexOf('?');
+    const path = queryAt === -1 ? url : url.slice(0, queryAt);
+    // Redirects keep the query string, so campaign and search parameters survive the slash.
+    const query = queryAt === -1 ? '' : url.slice(queryAt);
     if (!path.endsWith('/') && onDemand.has(`${path}/`)) {
       res.statusCode = 301;
-      res.setHeader('Location', `${path}/`);
+      res.setHeader('Location', `${path}/${query}`);
       res.end();
       return;
     }
@@ -107,7 +111,7 @@ export function createApp({ clientDir, ssr, ssrPaths }) {
     if (folder !== undefined && folder !== '/') {
       // Relative, since requests reach the pod through a tunnel on another host and port.
       res.statusCode = 301;
-      res.setHeader('Location', folder);
+      res.setHeader('Location', `${folder}${query}`);
       res.end();
       return;
     }
