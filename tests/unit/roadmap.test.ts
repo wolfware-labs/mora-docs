@@ -81,6 +81,17 @@ describe('fetchRoadmap', () => {
     expect(calls.some((c) => c.includes('milestone=1&'))).toBe(false);
   });
 
+  it('sends the token its auth source gives on every call', async () => {
+    const auths: (string | null)[] = [];
+    const fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
+      auths.push(new Headers(init?.headers).get('authorization'));
+      const body = auths.length === 1 ? [milestone(1, 'M0: Foundations', 0, 27)] : [];
+      return new Response(JSON.stringify(body), { status: 200 });
+    }) as typeof globalThis.fetch;
+    await fetchRoadmap({ fetch, auth: () => Promise.resolve('ghs_app') });
+    expect(auths).toEqual(['Bearer ghs_app', 'Bearer ghs_app']);
+  });
+
   it('rejects an unexpected response', async () => {
     await expect(fetchRoadmap({ fetch: fakeFetch({ 'milestones?': [{ number: 'one' }] }) })).rejects.toThrow();
   });

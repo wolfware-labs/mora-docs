@@ -31,7 +31,7 @@ The signup form appears only when `PUBLIC_MAILERLITE_ACTION` is set to a MailerL
 
 ## Deploy
 
-Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into a Node image (`server/main.mjs`), smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. The roadmap needs no rebuild: the running site reads GitHub itself, with a read-only token in `GITHUB_TOKEN`.
+Every push to `main` runs semantic-release, which tags a version from the commit messages, then builds the site into a Node image (`server/main.mjs`), smoke-tests it and pushes it to `docker.io/wolfware/mora-site`. The roadmap needs no rebuild: the running site reads GitHub itself. Deployed, it signs in as a GitHub App (`GITHUB_APP_ID` and `GITHUB_APP_PRIVATE_KEY`, the PEM key with real or `\n` line breaks) and asks for hourly tokens limited to reading mora-lang's issues; without them it uses `GITHUB_TOKEN`, then no token.
 
 ## License
 

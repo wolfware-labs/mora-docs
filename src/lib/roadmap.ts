@@ -1,4 +1,5 @@
 import snapshot from '../data/roadmap.snapshot.json' with { type: 'json' };
+import { authFromEnv, type TokenSource } from './github-auth';
 
 const REPO = 'wolfware-labs/mora-lang';
 const API = `https://api.github.com/repos/${REPO}`;
@@ -79,7 +80,8 @@ type ApiIssue = { number: number; title: string; html_url: string; pull_request?
 
 type Options = {
   fetch?: typeof globalThis.fetch;
-  token?: string | undefined;
+  /** Where the token comes from; by default the App or GITHUB_TOKEN from the environment. */
+  auth?: TokenSource;
   now?: Date;
 };
 
@@ -108,16 +110,24 @@ export function fromSnapshot(): Roadmap {
   return snapshot as Roadmap;
 }
 
+let envAuth: TokenSource | undefined;
+/** Read from the environment on first use, so one App token serves every refresh. */
+function defaultAuth(): TokenSource {
+  envAuth ??= authFromEnv();
+  return envAuth;
+}
+
 /** Fetches the roadmap from GitHub. Throws on any failure or unexpected shape. */
 export async function fetchRoadmap({
   fetch = globalThis.fetch,
-  token = process.env.GITHUB_TOKEN,
+  auth = defaultAuth(),
   now = new Date(),
 }: Options = {}): Promise<Roadmap> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'mora-site',
   };
+  const token = await auth();
   if (token) headers.Authorization = `Bearer ${token}`;
 
   async function get(path: string): Promise<unknown[]> {
