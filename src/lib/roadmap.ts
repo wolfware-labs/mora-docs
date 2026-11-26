@@ -1,7 +1,9 @@
 import snapshot from '../data/roadmap.snapshot.json' with { type: 'json' };
+import { GitHubError, authFromEnv, type TokenSource } from './github-auth';
 
-const REPO = 'wolfware-labs/mora-lang';
-const API = `https://api.github.com/repos/${REPO}`;
+const OWNER = 'wolfware-labs';
+const REPO = 'mora-lang';
+const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
 /** Ideas being evaluated carry this label and no milestone. */
 const EXPLORE_LABEL = 'explore';
 /** Milestones from this one on are post-MVP; the roadmap lists their issues. */
@@ -22,7 +24,7 @@ export type Milestone = {
 };
 
 export type Roadmap = {
-  /** ISO date of the data, the day it was fetched. */
+  /** When the data was fetched, as an ISO timestamp. */
   asOf: string;
   milestones: Milestone[];
   explorations: Issue[];
@@ -34,6 +36,14 @@ export function milestoneStatus(m: Pick<Milestone, 'open' | 'closed'>): Mileston
   if (m.closed > 0 && m.open === 0) return 'done';
   if (m.closed > 0) return 'in-progress';
   return 'planned';
+}
+
+/** "2026-11-26T15:04:09.000Z" becomes "November 26, 2026, 15:04 UTC". */
+export function updatedText(asOf: string): string {
+  const when = new Date(asOf);
+  const date = when.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+  const time = when.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+  return `${date}, ${time} UTC`;
 }
 
 /** "M6: Async and HTTP" becomes { code: "M6", name: "Async and HTTP" }. */
@@ -69,7 +79,8 @@ type ApiIssue = { number: number; title: string; html_url: string; pull_request?
 
 type Options = {
   fetch?: typeof globalThis.fetch;
-  token?: string | undefined;
+  /** Where the token comes from; by default the App or GITHUB_TOKEN from the environment. */
+  auth?: TokenSource;
   now?: Date;
 };
 
@@ -98,21 +109,29 @@ export function fromSnapshot(): Roadmap {
   return snapshot as Roadmap;
 }
 
+let envAuth: TokenSource | undefined;
+/** Read from the environment on first use, so one App token serves every refresh. */
+function defaultAuth(): TokenSource {
+  envAuth ??= authFromEnv({ owner: OWNER, repo: REPO });
+  return envAuth;
+}
+
 /** Fetches the roadmap from GitHub. Throws on any failure or unexpected shape. */
 export async function fetchRoadmap({
   fetch = globalThis.fetch,
-  token = process.env.GITHUB_TOKEN,
+  auth = defaultAuth(),
   now = new Date(),
 }: Options = {}): Promise<Roadmap> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'mora-site',
   };
+  const token = await auth();
   if (token) headers.Authorization = `Bearer ${token}`;
 
   async function get(path: string): Promise<unknown[]> {
     const res = await fetch(`${API}/${path}`, { headers, signal: AbortSignal.timeout(10_000) });
-    if (res.status !== 200) throw new Error(`GitHub answered ${res.status} for ${path}`);
+    if (res.status !== 200) throw new GitHubError(res.status, path);
     const body: unknown = await res.json();
     if (!Array.isArray(body)) throw new Error(`unexpected response shape for ${path}`);
     return body;
@@ -144,30 +163,61 @@ export async function fetchRoadmap({
   );
 
   return {
-    asOf: now.toISOString().slice(0, 10),
+    asOf: now.toISOString(),
     milestones: milestones.filter((m) => m.code !== '').sort(byNumber),
     explorations: await issues(`milestone=none&labels=${EXPLORE_LABEL}`),
   };
 }
 
+type CacheOptions = {
+  /** What to serve until the first refresh lands. */
+  initial: Roadmap;
+  load: () => Promise<Roadmap>;
+  ttlMs: number;
+  now?: () => number;
+};
+
 /**
- * The live roadmap, or the committed snapshot when ROADMAP_OFFLINE is set or GitHub
- * cannot be reached. A failed fetch never fails the build.
+ * Stale-while-revalidate: get() answers at once with the data it holds and, when that is
+ * older than the TTL, starts one background refresh. A failed refresh keeps the last good
+ * data and is retried after another TTL, so an outage at GitHub never reaches a reader.
  */
-export async function loadRoadmap(options: Options = {}): Promise<Roadmap> {
-  if (process.env.ROADMAP_OFFLINE) return fromSnapshot();
-  try {
-    return await fetchRoadmap(options);
-  } catch (err) {
-    console.warn(`roadmap: using the committed snapshot (${(err as Error).message})`);
-    return fromSnapshot();
+export function createRoadmapCache({ initial, load, ttlMs, now = Date.now }: CacheOptions) {
+  let data = initial;
+  let checkedAt = Number.NEGATIVE_INFINITY;
+  let refreshing = false;
+
+  function refresh() {
+    refreshing = true;
+    checkedAt = now();
+    load()
+      .then((fresh) => {
+        data = fresh;
+      })
+      .catch((err: Error) => console.warn(`roadmap: keeping the data from ${data.asOf} (${err.message})`))
+      .finally(() => {
+        refreshing = false;
+      });
   }
+
+  return {
+    get(): Roadmap {
+      if (!refreshing && now() - checkedAt > ttlMs) refresh();
+      return data;
+    },
+  };
 }
 
-let cached: Promise<Roadmap> | undefined;
+/** How long the server serves the roadmap before it asks GitHub again. */
+const TTL_MS = 5 * 60 * 1000;
 
-/** loadRoadmap, fetched once per build and shared by every page. */
-export function roadmap(): Promise<Roadmap> {
-  cached ??= loadRoadmap();
-  return cached;
+const live = createRoadmapCache({
+  initial: fromSnapshot(),
+  load: () => (process.env.ROADMAP_OFFLINE ? Promise.resolve(fromSnapshot()) : fetchRoadmap()),
+  ttlMs: TTL_MS,
+});
+
+/** The roadmap the server renders: live from GitHub, at most a TTL old. */
+export function roadmap(): Roadmap {
+  return live.get();
 }

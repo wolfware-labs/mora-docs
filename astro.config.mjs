@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
@@ -12,6 +13,11 @@ const moraTheme = json('./src/lib/mora-theme.json');
 export default defineConfig({
   site: 'https://moralang.org',
   outDir: process.env.MORA_OUT_DIR || 'dist',
+  // Every page is prerendered except the landing and the roadmap, which show live roadmap
+  // data; server/main.mjs serves both kinds.
+  adapter: node({ mode: 'middleware' }),
+  // Bundle the server's dependencies, so the image runs without node_modules.
+  vite: { ssr: { noExternal: true } },
   integrations: [
     react(),
     starlight({

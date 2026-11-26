@@ -5,12 +5,9 @@ name: Deploy
 on:
   push:
     branches: [main]
-  # mora-lang sends roadmap-changed when a milestone changes, or an issue
-  # that is in a milestone or labelled explore changes, so the roadmap page
-  # follows GitHub within minutes. The nightly run stays as a fallback for a
-  # missed dispatch.
-  repository_dispatch:
-    types: [roadmap-changed]
+  # The docs pages are generated from the language spec, which
+  # scripts/sync-spec.mjs reads from mora-lang at build time, so a
+  # nightly rebuild picks up spec changes made since the last push.
   schedule:
     - cron: "23 6 * * *"
   workflow_dispatch:
@@ -53,7 +50,6 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/build-site
         with:
-          github-token: ${{ github.token }}
           mailerlite-action: ${{ vars.PUBLIC_MAILERLITE_ACTION }}
       - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:

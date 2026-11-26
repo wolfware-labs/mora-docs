@@ -1,12 +1,9 @@
 name: Build site
-description: Install dependencies and, optionally, build the static site.
+description: Install dependencies and, optionally, build the site.
 inputs:
   build:
     description: Set to "false" to install only.
     default: "true"
-  github-token:
-    description: Token for the roadmap requests.
-    default: ""
   mailerlite-action:
     description: Value for PUBLIC_MAILERLITE_ACTION.
     default: ""
@@ -26,5 +23,4 @@ runs:
       run: pnpm build
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
         PUBLIC_MAILERLITE_ACTION: ${{ inputs.mailerlite-action }}

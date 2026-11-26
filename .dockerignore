@@ -1,0 +1,6 @@
+# The image needs the build output, the server and the manifests; nothing else.
+*
+!package.json
+!pnpm-lock.yaml
+!server/
+!dist/

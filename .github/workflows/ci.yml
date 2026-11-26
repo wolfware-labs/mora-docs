@@ -14,7 +14,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/build-site
         with:
-          github-token: ${{ github.token }}
           mailerlite-action: ${{ vars.PUBLIC_MAILERLITE_ACTION }}
       - run: pnpm typecheck
       - run: pnpm test
@@ -33,7 +32,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/build-site
         with:
-          github-token: ${{ github.token }}
           mailerlite-action: ${{ vars.PUBLIC_MAILERLITE_ACTION }}
       - run: docker build -t mora-site:ci .
       - run: bash scripts/smoke-image.sh mora-site:ci
