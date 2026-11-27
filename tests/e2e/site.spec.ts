@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import snapshot from '../../src/data/roadmap.snapshot.json' with { type: 'json' };
 import { RELEASES } from '../../src/data/releases';
 import { progress } from '../../src/lib/roadmap';
@@ -8,6 +8,10 @@ import { INTRO, POINTS, plain } from '../../src/data/pitch';
 const mvp = snapshot.milestones.filter((m) => RELEASES[0].milestones.includes(m.code));
 const mvpProgress = progress(mvp);
 const mvpText = `${mvpProgress.closed} of ${mvpProgress.total} issues closed`;
+
+/** The `content` of the page's `<meta {attr}="{name}">` tag. */
+const meta = (page: Page, attr: 'name' | 'property', name: string) =>
+  page.locator(`meta[${attr}="${name}"]`).getAttribute('content');
 
 test('the landing page shows the hero program and the MVP progress', async ({ page }) => {
   await page.goto('/');
@@ -195,14 +199,13 @@ for (const [path, card] of [
 ]) {
   test(`${path} links a 1200x630 share card`, async ({ page, request }) => {
     await page.goto(path);
-    const meta = (attr: string, name: string) => page.locator(`meta[${attr}="${name}"]`).getAttribute('content');
     const image = `https://moralang.org${card}`;
-    expect(await meta('property', 'og:image')).toBe(image);
-    expect(await meta('name', 'twitter:image')).toBe(image);
-    expect(await meta('property', 'og:image:width')).toBe('1200');
-    expect(await meta('property', 'og:image:height')).toBe('630');
-    expect(await meta('property', 'og:image:alt')).toMatch(/^Mora share card: /);
-    expect(await meta('name', 'twitter:card')).toBe('summary_large_image');
+    expect(await meta(page, 'property', 'og:image')).toBe(image);
+    expect(await meta(page, 'name', 'twitter:image')).toBe(image);
+    expect(await meta(page, 'property', 'og:image:width')).toBe('1200');
+    expect(await meta(page, 'property', 'og:image:height')).toBe('630');
+    expect(await meta(page, 'property', 'og:image:alt')).toMatch(/^Mora share card: /);
+    expect(await meta(page, 'name', 'twitter:card')).toBe('summary_large_image');
 
     const res = await request.get(card);
     expect(res.ok()).toBe(true);
@@ -224,7 +227,7 @@ test('the landing page describes Mora in JSON-LD', async ({ page }) => {
     codeRepository: 'https://github.com/wolfware-labs/mora-lang',
     author: { '@type': 'Organization', name: 'Wolfware', legalName: 'Wolfware LLC' },
   });
-  expect(data.description).toBe(await page.locator('meta[name="description"]').getAttribute('content'));
+  expect(data.description).toBe(await meta(page, 'name', 'description'));
 
   await page.goto('/roadmap/');
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
@@ -236,12 +239,11 @@ test('the landing page has its search title and description', async ({ page }) =
     'Mora is a general-purpose language with clean syntax that compiles to one native executable, with dependency injection and contracts built in.';
   await page.goto('/');
   await expect(page).toHaveTitle(title);
-  const content = (selector: string) => page.locator(selector).getAttribute('content');
-  expect(await content('meta[name="description"]')).toBe(description);
-  expect(await content('meta[property="og:title"]')).toBe(title);
-  expect(await content('meta[name="twitter:title"]')).toBe(title);
-  expect(await content('meta[property="og:description"]')).toBe(description);
-  expect(await content('meta[name="twitter:description"]')).toBe(description);
+  expect(await meta(page, 'name', 'description')).toBe(description);
+  expect(await meta(page, 'property', 'og:title')).toBe(title);
+  expect(await meta(page, 'name', 'twitter:title')).toBe(title);
+  expect(await meta(page, 'property', 'og:description')).toBe(description);
+  expect(await meta(page, 'name', 'twitter:description')).toBe(description);
 });
 
 test('the 404 page links no share card', async ({ page }) => {
