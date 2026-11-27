@@ -230,6 +230,20 @@ test('the landing page describes Mora in JSON-LD', async ({ page }) => {
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
 });
 
+test('the landing page has its search title and description', async ({ page }) => {
+  const title = 'Mora programming language: clear syntax, native speed';
+  const description =
+    'Mora is a general-purpose language with clean syntax that compiles to one native executable, with dependency injection and contracts built in.';
+  await page.goto('/');
+  await expect(page).toHaveTitle(title);
+  const content = (selector: string) => page.locator(selector).getAttribute('content');
+  expect(await content('meta[name="description"]')).toBe(description);
+  expect(await content('meta[property="og:title"]')).toBe(title);
+  expect(await content('meta[name="twitter:title"]')).toBe(title);
+  expect(await content('meta[property="og:description"]')).toBe(description);
+  expect(await content('meta[name="twitter:description"]')).toBe(description);
+});
+
 test('the 404 page links no share card', async ({ page }) => {
   await page.goto('/no-such-page/');
   await expect(page.locator('meta[property="og:image"]')).toHaveCount(0);
